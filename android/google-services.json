@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "881105256691",
+    "firebase_url": "https://essalud-gcpp.firebaseio.com",
+    "project_id": "essalud-gcpp",
+    "storage_bucket": "essalud-gcpp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:881105256691:android:e3d5f94a25eff0f8e9b786",
+        "android_client_info": {
+          "package_name": "com.example.gcpp_essalud"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "881105256691-1gdqp1018pshnukpjkvjjo62d5s2ig00.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5fv-q431AxH15CPt4M3CF5ohSASg8wvg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "881105256691-1gdqp1018pshnukpjkvjjo62d5s2ig00.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
