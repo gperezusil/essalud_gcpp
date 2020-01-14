@@ -15,6 +15,7 @@ class FirstPage extends StatefulWidget {
 class _FirstPageState extends State<FirstPage> {
   List<Datos> lista;
   List<Datos> detalleLista;
+  String titulo;
   Random random = new Random();
   CloudService db = new CloudService();
 
@@ -24,6 +25,7 @@ class _FirstPageState extends State<FirstPage> {
     super.initState();
     llenarLista('Ingresos');
     llenarListaDetalle('Ingresos Operativos');
+    titulo = 'Ingresos Operativos';
   }
 
   @override
@@ -46,7 +48,7 @@ class _FirstPageState extends State<FirstPage> {
     ));
   }
 
-  FlutterMoneyFormatter formatearNumero(int variable) {
+  FlutterMoneyFormatter formatearNumero(double variable) {
     return FlutterMoneyFormatter(amount: variable.toDouble());
   }
 
@@ -157,6 +159,8 @@ class _FirstPageState extends State<FirstPage> {
                           )),
                           onTap: () {
                             llenarLista('Ingresos');
+                            llenarListaDetalle('Ingresos Operativos');
+                            titulo = 'Ingresos Operativos';
                           });
                     },
                   ),
@@ -213,6 +217,8 @@ class _FirstPageState extends State<FirstPage> {
                           )),
                           onTap: () {
                             llenarLista('Egresos');
+                            llenarListaDetalle('Gastos Operativos');
+                            titulo = 'Gastos Operativos';
                           });
                     },
                   )
@@ -238,7 +244,7 @@ class _FirstPageState extends State<FirstPage> {
             radius: 100,
             lineWidth: 11.0,
             animation: true,
-            percent: verificarNumero(item.porcentaje).toDouble(),
+            percent: verificarNumero(item.porcentaje),
             center: new Text(
               (item.porcentaje * 100).toString() + "%",
               style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0),
@@ -270,10 +276,21 @@ class _FirstPageState extends State<FirstPage> {
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         child: Container(
-            child: Padding(
+            child: 
+                Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 5,5),
+                      child: Text(titulo,style: new TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18.0))
+                    )
+                   ,              
+                    Padding(
                 padding: EdgeInsets.fromLTRB(15, 10, 5, 15),
-                child: Column(
-                  children: detalleLista.map((item){
+                child : Column(
+                  children: 
+                  detalleLista.map((item){
                     return  Column(
                       children: <Widget>[
                         Text(item.titulo,
@@ -286,7 +303,8 @@ class _FirstPageState extends State<FirstPage> {
                             lineHeight: 16.0,
                             animationDuration: 2500,
                             percent: verificarNumero(item.porcentaje).toDouble(),
-                            center: Text((item.porcentaje*100).toString()+'%',
+                            center: Text(
+                              formatearNumero((item.porcentaje*100)).output.nonSymbol.toString()+'%',
                                 style: new TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12.0)),
@@ -298,8 +316,8 @@ class _FirstPageState extends State<FirstPage> {
                       ],
                     );
                   }).toList())
+                )]
 
-                  
                 )));
   }
 }
