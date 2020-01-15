@@ -1,0 +1,198 @@
+    [
+        {
+            "DEPARTAM": "UCAYALI",
+            "coordinates": [
+                -73.75898,
+                -10.72806
+            ]
+        },
+        {
+            "DEPARTAM": "TUMBES",
+            "coordinates": [
+                -80.45388,
+                -3.56473
+            ]
+        },
+        {
+            "DEPARTAM": "REBAGLIATI",
+            "coordinates": [
+                -77.0323,
+                -12.04668
+            ]
+        },
+        {
+            "DEPARTAM": "HUARAZ",
+            "coordinates": [
+                -77.52971,
+                -9.53232
+            ]
+        },
+        {
+            "DEPARTAM": "SABOGAL",
+            "coordinates": [
+                -77.14931,
+                -12.06051
+            ]
+        },
+        {
+            "DEPARTAM": "MADRE DE DIOS",
+            "coordinates": [
+                -69.18762,
+                -12.59742
+            ]
+        },
+        {
+            "DEPARTAM": "APURIMAC",
+            "coordinates": [
+                -72.8793,
+                -13.63688
+            ]
+        },
+        {
+            "DEPARTAM": "AMAZONAS",
+            "coordinates": [
+                -77.86351,
+                -6.23105
+            ]
+        },
+        {
+            "DEPARTAM": "PIURA",
+            "coordinates": [
+                -80.62973,
+                -5.19598
+            ]
+        },
+        {
+            "DEPARTAM": "LORETO",
+            "coordinates": [
+                -73.26218,
+                -3.74993
+            ]
+        },
+        {
+            "DEPARTAM": "LA LIBERTAD",
+            "coordinates": [
+                -79.03348,
+                -8.1095
+            ]
+        },
+        {
+            "DEPARTAM": "MOQUEGUA",
+            "coordinates": [
+                -70.93721,
+                -17.19522
+            ]
+        },
+        {
+            "DEPARTAM": "JULIACA",
+            "coordinates": [
+                -70.13582,
+                -15.49396
+            ]
+        },
+        {
+            "DEPARTAM": "PASCO",
+            "coordinates": [
+                -76.26095,
+                -10.68122
+            ]
+        },
+        {
+            "DEPARTAM": "ICA",
+            "coordinates": [
+                -75.7282,
+                -14.07071
+            ]
+        },
+        {
+            "DEPARTAM": "LAMBAYEQUE",
+            "coordinates": [
+                -79.90942,
+                -6.7025
+            ]
+        },
+        {
+            "DEPARTAM": "ANCASH",
+            "coordinates": [
+                -77.17616,
+                -9.349
+            ]
+        },
+        {
+            "DEPARTAM": "JUNIN",
+            "coordinates": [
+                -75.99829,
+                -11.16582
+            ]
+        },
+        {
+            "DEPARTAM": "PUNO",
+            "coordinates": [
+                -70.02803,
+                -15.84065
+            ]
+        },
+        {
+            "DEPARTAM": "CAJAMARCA",
+            "coordinates": [
+                -78.52179,
+                -7.15742
+            ]
+        },
+        {
+            "DEPARTAM": "AREQUIPA",
+            "coordinates": [
+                -71.53793,
+                -16.40102
+            ]
+        },
+        {
+            "DEPARTAM": "MOYOBAMBA",
+            "coordinates": [
+                -76.97251,
+                -6.03309
+            ]
+        },
+        {
+            "DEPARTAM": "TACNA",
+            "coordinates": [
+                -70.25581,
+                -18.01447
+            ]
+        },
+        {
+            "DEPARTAM": "TARAPOTO",
+            "coordinates": [
+                -76.36512,
+                -6.48895
+            ]
+        },
+        {
+            "DEPARTAM": "HUANUCO",
+            "coordinates": [
+                -76.24511,
+                -9.92783
+            ]
+        },
+        {
+            "DEPARTAM": "AYACUCHO",
+            "coordinates": [
+                -74.22667,
+                -13.16055
+            ]
+        },
+        {
+            "DEPARTAM": "CUSCO",
+            "coordinates": [
+                -71.9801,
+                -13.51532
+            ]
+        },
+        {
+            "DEPARTAM": "HUANCAVELICA",
+            "coordinates": [
+                -74.97594,
+                -12.78842
+            ]
+        }
+    ]
