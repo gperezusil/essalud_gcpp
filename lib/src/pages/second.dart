@@ -1,18 +1,18 @@
 import 'dart:convert';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gcpp_essalud/src/modelos/redes.dart';
 import 'package:gcpp_essalud/src/util/metodos.dart';
+import 'package:gcpp_essalud/src/pages/detalleRed.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class SecondPage extends StatefulWidget {
+   SecondPage({Key key, this.title}) : super(key: key);
+  final String title;
   @override
   _SecondPageState createState() => _SecondPageState();
 }
@@ -23,7 +23,7 @@ class _SecondPageState extends State<SecondPage> {
   Position position;
   Widget _child;
   List<Widget> details = [];
-  PanelController _pc = new PanelController();
+  PanelController _pc ;
   Metodos me = new Metodos();
   String titulo = 'Todas las Redes';
   var data;
@@ -84,9 +84,10 @@ class _SecondPageState extends State<SecondPage> {
 
   @override
   void initState() {
+    _pc= new PanelController();
     loadJsonData();
+     details.add(DetalleRed(red:'TOTAL'));
     getPermision();
-
     super.initState();
   }
 
@@ -106,19 +107,23 @@ class _SecondPageState extends State<SecondPage> {
   }
 
   Widget _mapWidget() {
-    return Stack(
-      children: <Widget>[
+    return SlidingUpPanel(
+      body:
         GoogleMap(
           mapType: MapType.normal,
+          
           markers: {
-            for (Redes re in redes)
-              if (re.nomRed.length > 0)
+            for (Redes red in redes)
+              if (red.nomRed.length > 0)
                 Marker(
-                  markerId: MarkerId(re.nomRed),
-                  position: LatLng(re.longuitud, re.latitude),
+                  markerId: MarkerId(red.nomRed),
+                  position: LatLng(red.longuitud, red.latitude),
                   onTap: () {
+                    
                     this.setState(() {
-                      this.titulo = re.nomRed;
+                      print(red.nomRed);
+                      details.clear();
+                      details.add(DetalleRed(red:red.nomRed));
                       _pc.open();
                     });
                   },
@@ -131,211 +136,23 @@ class _SecondPageState extends State<SecondPage> {
             _controller = controller;
           },
         ),
-        slider()
-      ],
-    );
-  }
-
-  Widget slider() {
-    BorderRadiusGeometry radius = BorderRadius.only(
-      topLeft: Radius.circular(40.0),
-      topRight: Radius.circular(40.0),
-    );
-
-    return SlidingUpPanel(
-      panel: Center(
-        child: Column(
-          children: <Widget>[
-            Center(
-              child: Padding(
-                  padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
-                  child: Text("Todas las Redes")),
-            ),
-            StreamBuilder<QuerySnapshot>(
-              stream: Firestore.instance
-                  .collection('Redes')
-                  .where('red', isEqualTo: 'TOTAL')
-                  .where('rubro', isEqualTo: 'SUB-TOTAL')
-                  .snapshots(),
-              builder:
-                  (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
-                if (!data.hasData) {
-                  return Text('Cargando Informacion');
-                }
-                return GestureDetector(
-                    child: Container(
-                        child: Column(
-                      children: [
-                        new CircularPercentIndicator(
-                          radius: 120.0,
-                          lineWidth: 13.0,
-                          animation: true,
-                          percent: me.verificarNumero(
-                              data.data.documents[0]['porcentaje']),
-                          center: new Text(
-                            me
-                                    .formatearNumero(data.data.documents[0]
-                                            ['porcentaje'] *
-                                        100)
-                                    .output
-                                    .nonSymbol
-                                    .toString() +
-                                '%',
-                            style: new TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20.0),
-                          ),
-                          footer: new Text(
-                            me
-                                .formatearNumero(
-                                    data.data.documents[0]['ejecucion'])
-                                .output
-                                .withoutFractionDigits
-                                .toString(),
-                            style: new TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15.0),
-                          ),
-                          circularStrokeCap: CircularStrokeCap.round,
-                          progressColor: Colors.purple,
-                        )
-                      ],
-                    )),
-                    onTap: () {});
-              },
-            ),
-           StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
-          .collection('Redes')
-          .where('red', isEqualTo: 'TOTAL')
-          .where('rubro', whereIn:['PERSONAL','BIENES','SERVICIOS'])
-          .snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
-        if (!data.hasData) {
-           return Text('Cargando Informacion');
-        }
-        if (data.hasError) {
-         return Text('Cargando Informacion');
-        
-        }
-        return GestureDetector(
-            child: Container(
-                child: Column(
-              children: data.data.documents.map((item){
-                new CircularPercentIndicator(
-                  radius: 120.0,
-                  lineWidth: 13.0,
-                  animation: true,
-                  percent:
-                      me.verificarNumero(item.data['porcentaje']),
-                  center: new Text(
-                    me
-                            .formatearNumero(
-                                item.data['porcentaje'] * 100)
-                            .output
-                            .nonSymbol
-                            .toString() +
-                        '%',
-                    style: new TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 20.0),
-                  ),
-                  header: Text(
-                  item.data['rubro'].toString(),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ) ,
-                  footer: new Text(
-                    me
-                        .formatearNumero(item.data['ejecucion'])
-                        .output
-                        .withoutFractionDigits
-                        .toString(),
-                    style: new TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 15.0),
-                  ),
-                  circularStrokeCap: CircularStrokeCap.round,
-                  progressColor: Colors.purple,
-                );
-              }).toList() 
-
-                
-              ,
-            )),
-            onTap: () {});
-      },
-    )
-          ],
-        ),
-      ),
-      borderRadius: radius,
+       panel: 
+          SingleChildScrollView(
+              child: Column(
+                children: details,
+              ),
+          ),
+      borderRadius: border(),
       controller: _pc,
     );
   }
 
-  Widget detalleRedes(String red) {
-    return Wrap(
-      children: <Widget>[    StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
-          .collection('Redes')
-          .where('red', isEqualTo: red)
-          .where('rubro', whereIn:['PERSONAL','BIENES','SERVICIOS'])
-          .snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
-        if (!data.hasData) {
-           return Text('Cargando Informacion');
-        }
-        if (data.hasError) {
-         return Text('Cargando Informacion');
-        
-        }
-        return GestureDetector(
-            child: Container(
-                child: Column(
-              children: data.data.documents.map((item){
-                new CircularPercentIndicator(
-                  radius: 120.0,
-                  lineWidth: 13.0,
-                  animation: true,
-                  percent:
-                      me.verificarNumero(item.data['porcentaje']),
-                  center: new Text(
-                    me
-                            .formatearNumero(
-                                item.data['porcentaje'] * 100)
-                            .output
-                            .nonSymbol
-                            .toString() +
-                        '%',
-                    style: new TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 20.0),
-                  ),
-                  header: Text(
-                  item.data['rubro'].toString(),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ) ,
-                  footer: new Text(
-                    me
-                        .formatearNumero(item.data['ejecucion'])
-                        .output
-                        .withoutFractionDigits
-                        .toString(),
-                    style: new TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 15.0),
-                  ),
-                  circularStrokeCap: CircularStrokeCap.round,
-                  progressColor: Colors.purple,
-                );
-              }).toList() 
 
-                
-              ,
-            )),
-            onTap: () {});
-      },
-    )],
+BorderRadiusGeometry border(){
+  return BorderRadius.only(
+      topLeft: Radius.circular(40.0),
+      topRight: Radius.circular(40.0),
     );
-  }
+}
+
 }

@@ -12,4 +12,8 @@ class Metodos{
     FlutterMoneyFormatter formatearNumero(double variable) {
     return FlutterMoneyFormatter(amount: variable.toDouble());
   }
+
+ String mayuscula(String s){
+    return  s[0].toUpperCase() + s.substring(1);
+  }
 }
