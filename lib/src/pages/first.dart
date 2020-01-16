@@ -109,7 +109,7 @@ class _FirstPageState extends State<FirstPage> {
                   StreamBuilder<QuerySnapshot>(
                     stream: Firestore.instance
                         .collection('Ingresos')
-                        .where('titulo', isEqualTo: 'Ingresos')
+                        .where('padre', isEqualTo: 'Ingresos Totales')
                         .snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<QuerySnapshot> data) {
@@ -135,8 +135,7 @@ class _FirstPageState extends State<FirstPage> {
                                 percent: verificarNumero(
                                     data.data.documents[0]['porcentaje']),
                                 center: new Text(
-                                  (data.data.documents[0]['porcentaje'] * 100)
-                                          .toString() +
+                                  formatearNumero(data.data.documents[0]['porcentaje'] * 100).output.compactNonSymbol.toString() +
                                       '%',
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -167,7 +166,7 @@ class _FirstPageState extends State<FirstPage> {
                   StreamBuilder<QuerySnapshot>(
                     stream: Firestore.instance
                         .collection('Ingresos')
-                        .where('titulo', isEqualTo: 'Egresos')
+                        .where('padre', isEqualTo: 'Egresos Totales')
                         .snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<QuerySnapshot> data) {
@@ -193,8 +192,7 @@ class _FirstPageState extends State<FirstPage> {
                                 percent: verificarNumero(
                                     data.data.documents[0]['porcentaje']),
                                 center: new Text(
-                                  (data.data.documents[0]['porcentaje'] * 100)
-                                          .toString() +
+                                    formatearNumero(data.data.documents[0]['porcentaje'] * 100).output.nonSymbol.toString() +
                                       '%',
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -246,12 +244,12 @@ class _FirstPageState extends State<FirstPage> {
             animation: true,
             percent: verificarNumero(item.porcentaje),
             center: new Text(
-              (item.porcentaje * 100).toString() + "%",
+              formatearNumero((item.porcentaje * 100)).output.nonSymbol.toString() + "%",
               style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0),
             ),
             header: Text(
               item.titulo,
-              style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 11.0),
+              style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 9.0),
             ),
             footer: new Text(
               formatearNumero(item.ejecucion)
