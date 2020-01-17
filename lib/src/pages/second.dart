@@ -11,8 +11,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class SecondPage extends StatefulWidget {
-   SecondPage({Key key, this.title}) : super(key: key);
-  final String title;
   @override
   _SecondPageState createState() => _SecondPageState();
 }
@@ -21,11 +19,10 @@ class _SecondPageState extends State<SecondPage> {
   GoogleMapController _controller;
   List<Redes> redes;
   Position position;
-  Widget _child;
   List<Widget> details = [];
   PanelController _pc ;
   Metodos me = new Metodos();
-  String titulo = 'Todas las Redes';
+  Widget _child;
   var data;
 
   loadJsonData() async {
@@ -84,17 +81,18 @@ class _SecondPageState extends State<SecondPage> {
 
   @override
   void initState() {
-    _pc= new PanelController();
+     getPermision();
+    super.initState();
+     _pc= new PanelController();
     loadJsonData();
      details.add(DetalleRed(red:'TOTAL'));
-    getPermision();
-    super.initState();
+   
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _child,
+      body: _mapWidget(context)
     );
   }
 
@@ -102,11 +100,18 @@ class _SecondPageState extends State<SecondPage> {
     Position res = await Geolocator().getCurrentPosition();
     setState(() {
       position = res;
-      _child = _mapWidget();
     });
   }
 
-  Widget _mapWidget() {
+  Widget _panel(context){
+        return  SingleChildScrollView(
+              child: Column(
+                children: details,
+              ),
+          );
+  }
+
+  Widget _mapWidget(context) {
     return SlidingUpPanel(
       body:
         GoogleMap(
@@ -119,9 +124,7 @@ class _SecondPageState extends State<SecondPage> {
                   markerId: MarkerId(red.nomRed),
                   position: LatLng(red.longuitud, red.latitude),
                   onTap: () {
-                    
                     this.setState(() {
-                      print(red.nomRed);
                       details.clear();
                       details.add(DetalleRed(red:red.nomRed));
                       _pc.open();
@@ -136,16 +139,15 @@ class _SecondPageState extends State<SecondPage> {
             _controller = controller;
           },
         ),
-       panel: 
-          SingleChildScrollView(
-              child: Column(
-                children: details,
-              ),
-          ),
+       panel: _panel(context) ,
       borderRadius: border(),
       controller: _pc,
+      backdropEnabled: true,
+      parallaxEnabled: true,
+      parallaxOffset: .5,
     );
   }
+
 
 
 BorderRadiusGeometry border(){
@@ -154,5 +156,8 @@ BorderRadiusGeometry border(){
       topRight: Radius.circular(40.0),
     );
 }
-
+  @override
+  void dispose() {
+    super.dispose();
+  }
 }

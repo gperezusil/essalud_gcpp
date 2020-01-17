@@ -6,6 +6,7 @@ import 'package:gcpp_essalud/src/modelos/datos.dart';
 import 'package:gcpp_essalud/src/services/firestore.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
+
 class FirstPage extends StatefulWidget {
   @override
   _FirstPageState createState() => _FirstPageState();

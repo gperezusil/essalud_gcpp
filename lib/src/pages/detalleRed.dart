@@ -50,8 +50,8 @@ class _DetalleRedState extends State<DetalleRed> {
                       children: [
 
                         new CircularPercentIndicator(
-                          radius: 100.0,
-                          lineWidth: 12.0,
+                          radius: 130.0,
+                          lineWidth: 15.0,
                           animation: true,
                           percent: me.verificarNumero(
                               data.data.documents[0]['porcentaje']),
