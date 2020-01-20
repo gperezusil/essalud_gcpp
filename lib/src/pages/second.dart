@@ -20,7 +20,7 @@ class _SecondPageState extends State<SecondPage> {
   List<Redes> redes;
   Position position;
   List<Widget> details = [];
-  PanelController _pc ;
+  PanelController _pc= new PanelController() ;
   Metodos me = new Metodos();
   Widget _child;
   var data;
@@ -83,7 +83,6 @@ class _SecondPageState extends State<SecondPage> {
   void initState() {
      getPermision();
     super.initState();
-     _pc= new PanelController();
     loadJsonData();
      details.add(DetalleRed(red:'TOTAL'));
    
