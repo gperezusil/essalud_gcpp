@@ -23,6 +23,7 @@ class _SecondPageState extends State<SecondPage> {
   PanelController _pc = new PanelController();
   Metodos me = new Metodos();
   Redes buscarDireccion;
+  Widget wid;
   var data;
 
   loadJsonData() async {
@@ -64,7 +65,7 @@ class _SecondPageState extends State<SecondPage> {
         break;
       case GeolocationStatus.granted:
         showToast('Acceso Permitido');
-        
+        _getCurrentLocation();
     }
   }
 
@@ -102,15 +103,21 @@ class _SecondPageState extends State<SecondPage> {
       ),
     );
   }
-
-  Widget _mapWidget(context) {
+  void _getCurrentLocation() async {
+    Position res = await Geolocator().getCurrentPosition();
+    setState(() {
+      position = res;
+      wid=_mapWidget(context);
+    });
+  }
+   Widget _mapWidget(context) {
     return SlidingUpPanel(
       body: Stack(
         children: <Widget>[
           GoogleMap(
             onMapCreated: onMapCreated,
             initialCameraPosition: CameraPosition(
-                target: LatLng(-12.0807377, -77.0371962),
+                target: LatLng(position.latitude, position.longitude),
                 zoom: 5.0),
             mapType: MapType.normal,
             markers: {
@@ -129,6 +136,8 @@ class _SecondPageState extends State<SecondPage> {
                   )
             },
             myLocationButtonEnabled: false,
+            rotateGesturesEnabled: false,
+            
           ),
           Positioned(
               top: 15.0,
@@ -184,9 +193,9 @@ class _SecondPageState extends State<SecondPage> {
     );
   }
 
-           void onMapCreated(controller) {
+           void onMapCreated(controller) async {
                  setState(() {
-                  _controller = controller; 
+                   _controller  =  controller; 
                  });
   }
   @override

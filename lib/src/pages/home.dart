@@ -57,7 +57,9 @@ class _HomeState extends State<HomePage>{
 
   @override
   Widget build(BuildContext context) {
-     return HiddenDrawerMenu(
+     return WillPopScope(
+       onWillPop: ()async =>false,
+       child: HiddenDrawerMenu(
              backgroundColorMenu: Colors.blue,
       backgroundColorAppBar: Colors.blue,
       screens: items,
@@ -77,7 +79,7 @@ class _HomeState extends State<HomePage>{
         //    tittleAppBar: Center(child: Icon(Icons.ac_unit),),
         //    enableShadowItensMenu: true,
         
-    );
+    ));
   }
 
 
