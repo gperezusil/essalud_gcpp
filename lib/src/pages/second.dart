@@ -20,9 +20,9 @@ class _SecondPageState extends State<SecondPage> {
   List<Redes> redes;
   Position position;
   List<Widget> details = [];
-  PanelController _pc= new PanelController() ;
+  PanelController _pc = new PanelController();
   Metodos me = new Metodos();
-  Widget _child;
+  Redes buscarDireccion;
   var data;
 
   loadJsonData() async {
@@ -64,7 +64,7 @@ class _SecondPageState extends State<SecondPage> {
         break;
       case GeolocationStatus.granted:
         showToast('Acceso Permitido');
-        _getCurrentLocation();
+        
     }
   }
 
@@ -74,71 +74,101 @@ class _SecondPageState extends State<SecondPage> {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIos: 1,
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.green,
         textColor: Colors.white,
         fontSize: 16.0);
   }
 
   @override
   void initState() {
-     getPermision();
+    getPermision();
     super.initState();
     loadJsonData();
-     details.add(DetalleRed(red:'TOTAL'));
-   
+    details.add(DetalleRed(red: 'TOTAL'));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _mapWidget(context)
+      body: _mapWidget(context),
     );
   }
 
-  void _getCurrentLocation() async {
-    Position res = await Geolocator().getCurrentPosition();
-    setState(() {
-      position = res;
-    });
-  }
 
-  Widget _panel(context){
-        return  SingleChildScrollView(
-              child: Column(
-                children: details,
-              ),
-          );
+  Widget _panel(context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: details,
+      ),
+    );
   }
 
   Widget _mapWidget(context) {
     return SlidingUpPanel(
-      body:
-        GoogleMap(
-          mapType: MapType.normal,
-          
-          markers: {
-            for (Redes red in redes)
-              if (red.nomRed.length > 0)
-                Marker(
-                  markerId: MarkerId(red.nomRed),
-                  position: LatLng(red.longuitud, red.latitude),
-                  onTap: () {
-                    this.setState(() {
-                      details.clear();
-                      details.add(DetalleRed(red:red.nomRed));
-                      _pc.open();
-                    });
-                  },
-                )
-          },
-          myLocationButtonEnabled: true,
-          initialCameraPosition: CameraPosition(
-              target: LatLng(position.latitude, position.longitude), zoom: 5.0),
-          onMapCreated: (GoogleMapController controller) {
-            _controller = controller;
-          },
-        ),
-       panel: _panel(context) ,
+      body: Stack(
+        children: <Widget>[
+          GoogleMap(
+            onMapCreated: onMapCreated,
+            initialCameraPosition: CameraPosition(
+                target: LatLng(-12.0807377, -77.0371962),
+                zoom: 5.0),
+            mapType: MapType.normal,
+            markers: {
+              for (Redes red in redes)
+                if (red.nomRed.length > 0)
+                  Marker(
+                    markerId: MarkerId(red.nomRed),
+                    position: LatLng(red.longuitud, red.latitude),
+                    onTap: () {
+                      this.setState(() {
+                        details.clear();
+                        details.add(DetalleRed(red: red.nomRed));
+                        _pc.open();
+                      });
+                    },
+                  )
+            },
+            myLocationButtonEnabled: false,
+          ),
+          Positioned(
+              top: 15.0,
+              right: 15.0,
+              left: 15.0,
+              child: Center(
+                  child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    color: Colors.white),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  child: DropdownButton<Redes>(
+                    value: buscarDireccion,
+                    icon: Icon(Icons.arrow_drop_down),
+                    iconSize: 24,
+                    elevation: 16,
+                    style: TextStyle(color: Colors.black, fontSize: 15),
+                    onChanged: (Redes data) {
+                      setState(() {
+                        buscarDireccion = data;
+                        _controller.animateCamera(
+                            CameraUpdate.newCameraPosition(CameraPosition(
+                                target: LatLng(buscarDireccion.longuitud,
+                                    buscarDireccion.latitude),
+                                zoom: 10.0)));
+                      });
+                    },
+                    items: redes.map<DropdownMenuItem<Redes>>((Redes valor) {
+                      return DropdownMenuItem<Redes>(
+                        value: valor,
+                        child: Text(valor.nomRed),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              )))
+        ],
+      ),
+      panel: _panel(context),
       borderRadius: border(),
       controller: _pc,
       backdropEnabled: true,
@@ -147,14 +177,18 @@ class _SecondPageState extends State<SecondPage> {
     );
   }
 
-
-
-BorderRadiusGeometry border(){
-  return BorderRadius.only(
+  BorderRadiusGeometry border() {
+    return BorderRadius.only(
       topLeft: Radius.circular(40.0),
       topRight: Radius.circular(40.0),
     );
-}
+  }
+
+           void onMapCreated(controller) {
+                 setState(() {
+                  _controller = controller; 
+                 });
+  }
   @override
   void dispose() {
     super.dispose();
