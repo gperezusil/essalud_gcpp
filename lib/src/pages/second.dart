@@ -57,7 +57,7 @@ class _SecondPageState extends State<SecondPage> {
         showToast('Desactivado');
         break;
       case GeolocationStatus.restricted:
-        showToast('Restricto');
+        showToast('No permitido');
         break;
       case GeolocationStatus.unknown:
         showToast('Desconocido');
