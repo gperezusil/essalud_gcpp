@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/pages/first.dart';
 import 'package:gcpp_essalud/src/pages/second.dart';
+import 'package:gcpp_essalud/src/pages/sede.dart';
 import 'package:hidden_drawer_menu/hidden_drawer/hidden_drawer_menu.dart';
  
 class HomePage extends StatefulWidget {
@@ -42,7 +43,7 @@ class _HomeState extends State<HomePage>{
           baseStyle: TextStyle( color: Colors.white.withOpacity(0.8), fontSize: 16.0 ),
           colorLineSelected: Colors.teal,
         ),
-        FirstPage()));
+        SedeCentral()));
           items.add(new ScreenHiddenDrawer(
         new ItemHiddenMenu(
           name: 'Inversiones',

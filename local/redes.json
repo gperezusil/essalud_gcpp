@@ -7,6 +7,27 @@
             ]
         },
         {
+            "DEPARTAM": "ALMENARA",
+            "coordinates": [
+                -77.022726,
+                -12.061015
+            ]
+        },
+        {
+            "DEPARTAM": "SALUD RENAL",
+            "coordinates": [
+                -77.038071,
+                -12.077468
+            ]
+        },
+        {
+            "DEPARTAM": "I.N.CARDIOVASCULAR",
+            "coordinates": [
+                -77.039957,
+                -12.076889
+            ]
+        },
+        {
             "DEPARTAM": "TOTAL",
             "coordinates": [
                 -77.0371962,

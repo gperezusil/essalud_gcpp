@@ -11,10 +11,9 @@ class CloudService{
 
     Stream<QuerySnapshot> getListDatos(String variable,{int offset, int limit}) {
     Stream<QuerySnapshot> snapshots = 
-    noteCollection.where('padre',isEqualTo: variable ).orderBy('titulo',descending: false)
+    noteCollection.where('padre',isEqualTo: variable )
     .snapshots();
  
-    
   
     return snapshots;
   }

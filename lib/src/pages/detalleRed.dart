@@ -20,7 +20,7 @@ class DetalleRed extends StatefulWidget {
 }
 
 class _DetalleRedState extends State<DetalleRed> {
-  DocumentSnapshot lista;
+  String rubro='BIENES';
   Metodos me = new Metodos();
   @override
   Widget build(BuildContext context) {
@@ -44,57 +44,55 @@ class _DetalleRedState extends State<DetalleRed> {
                 .snapshots(),
             builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
               if (!data.hasData) {
-                return Text('Cargando Informacion');
+                return Center(child: new CircularProgressIndicator());
               }
               return GestureDetector(
-                  child: Container(
-                      child: Column(
-                    children: [
-                      new CircularPercentIndicator(
-                        radius: 130.0,
-                        lineWidth: 15.0,
-                        animation: true,
-                        percent: me.verificarNumero(
-                            data.data.documents[0]['porcentaje']),
-                        center: new Text(
-                          me
-                                  .formatearNumero(data.data.documents[0]
-                                          ['porcentaje'] *
-                                      100)
-                                  .output
-                                  .nonSymbol
-                                  .toString() +
-                              '%',
-                          style: new TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18.0),
-                        ),
-                        footer: new Text(
-                          me
-                              .formatearNumero(
-                                  data.data.documents[0]['ejecucion'])
-                              .output
-                              .withoutFractionDigits
-                              .toString(),
-                          style: new TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15.0),
-                        ),
-                        circularStrokeCap: CircularStrokeCap.round,
-                        progressColor: Colors.purple,
-                      )
-                    ],
-                  )),
-                  );
+                child: Container(
+                    child: Column(
+                  children: [
+                    new CircularPercentIndicator(
+                      radius: 130.0,
+                      lineWidth: 15.0,
+                      animation: true,
+                      percent: me.verificarNumero(
+                          data.data.documents[0]['porcentaje']),
+                      center: new Text(
+                        me
+                                .formatearNumero(
+                                    data.data.documents[0]['porcentaje'] * 100)
+                                .output
+                                .nonSymbol
+                                .toString() +
+                            '%',
+                        style: new TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18.0),
+                      ),
+                      footer: new Text(
+                        me
+                            .formatearNumero(
+                                data.data.documents[0]['ejecucion'])
+                            .output
+                            .withoutFractionDigits
+                            .toString(),
+                        style: new TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15.0),
+                      ),
+                      circularStrokeCap: CircularStrokeCap.round,
+                      progressColor: Colors.green,
+                    )
+                  ],
+                )), 
+              );
             },
           ),
           SizedBox(height: 20),
           detalleRedes(context, red),
           SizedBox(height: 20),
-          detalleRedesCompromisos(context)
+          detalleRedesCompromisos(red,context)
         ],
       ),
     );
   }
-  
 
   Widget detalleRedes(context, String red) {
     return Wrap(
@@ -104,19 +102,19 @@ class _DetalleRedState extends State<DetalleRed> {
               .collection('Redes')
               .where('red', isEqualTo: red)
               .where('rubro',
-                  whereIn: ['PERSONAL', 'BIENES', 'SERVICIOS'])
-                 .snapshots(),
+                  whereIn: ['PERSONAL', 'BIENES', 'SERVICIOS']).snapshots(),
           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
             if (!data.hasData) {
-              return Text('Cargando Informacion');
+              return Center(child: new CircularProgressIndicator());
             }
+            data.data.documents.sort((a,b)=>a.data['rubro'].toString().compareTo(b.data['rubro'].toString()));
             return Column(children: <Widget>[
               Wrap(
                   alignment: WrapAlignment.center,
                   spacing: 20.0, // gap between adjacent chips
                   runSpacing: 8.0,
-                  children: data.data.documents.map((item) {  
-                   lista = item;
+                  children: data.data.documents.map((item) {
+                        
                     return new Wrap(children: <Widget>[
                       GestureDetector(
                         child: CircularPercentIndicator(
@@ -157,68 +155,102 @@ class _DetalleRedState extends State<DetalleRed> {
                         ),
                         onTap: () {
                           setState(() {
-                            this.lista = item;
+                              rubro=item.data['rubro'];
                           });
                         },
                       )
                     ]);
                   }).toList()),
-             
             ]);
           },
         )
       ],
     );
   }
+  
 
-  Widget detalleRedesCompromisos(BuildContext context) {
-
-    if(lista==null){
-      return Text("Cargando Informacion");
-    }
-    return Container(
-        child: Column(
-          children: [
-            Text(this.lista['rubro'],
-           style: new TextStyle(
-           fontWeight: FontWeight.bold, fontSize: 15.0)),
-           SizedBox(height: 10),
-      Wrap(
-        children: <Widget>[
-          Row(
+  detalleRedesCompromisos(String red,context) {
+            return 
+            Column(
+              children: <Widget>[
+                StreamBuilder<QuerySnapshot>(
+            stream: Firestore.instance
+                .collection('Redes')
+                .where('red', isEqualTo: red)
+                .where('rubro', isEqualTo: rubro)
+                .snapshots(),
+            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
+              if (!data.hasData) {
+                return Center(child: new CircularProgressIndicator());
+              }
+      return Wrap(
             children: <Widget>[
-                      DataTable(
-          columns: [
-            DataColumn(
-              label: Text("Tipo de Compromisos")),
-            DataColumn(label: Text("Soles"))],
-          rows: [
-          DataRow(cells: [
-          DataCell(Text("Solicitud de Pedidos")),
-          DataCell(Text(me.formatearNumero(this.lista.data['solped']).output.withoutFractionDigits.toString())),]),
-          DataRow(cells: [DataCell(Text("Pedidos")),
-          DataCell(Text(me.formatearNumero(this.lista.data['pedido']).output.withoutFractionDigits.toString())),]),
-          DataRow(cells: [DataCell(Text("Reservas")),
-          DataCell(Text(me.formatearNumero(this.lista.data['reserva']).output.withoutFractionDigits.toString())),
-          ]),
-          DataRow(cells: [DataCell(Text("Total",style: new TextStyle(
-           fontWeight: FontWeight.bold, fontSize: 15.0))),
-          DataCell(Text(me.formatearNumero(this.lista.data['comprometido']).output.withoutFractionDigits.toString(),
-          style: new TextStyle(
-           fontWeight: FontWeight.bold, fontSize: 15.0)),
-          ),
-          ]),
-          ],
-          sortColumnIndex: 0,
-          sortAscending: true,
-        ),
-          ],
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-
+              Center(
+                child:  Text(data.data.documents[0]['rubro'],
+                            style: new TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15.0)
+                                ),
+              ),
+              Row(
+                children: <Widget>[
+                  DataTable(
+                    columns: [
+                      DataColumn(label: Text("Tipo de Compromisos")),
+                      DataColumn(label: Text("Soles"))
+                    ],
+                    rows: [
+                      DataRow(cells: [
+                        DataCell(Text("Solicitud de Pedidos")),
+                        DataCell(Text(me
+                            .formatearNumero(data.data.documents[0]['solped'])
+                            .output
+                            .withoutFractionDigits
+                            .toString())),
+                      ]),
+                      DataRow(cells: [
+                        DataCell(Text("Pedidos")),
+                        DataCell(Text(me
+                            .formatearNumero(data.data.documents[0]['pedido'])
+                            .output
+                            .withoutFractionDigits
+                            .toString())),
+                      ]),
+                      DataRow(cells: [
+                        DataCell(Text("Reservas")),
+                        DataCell(Text(me
+                            .formatearNumero(data.data.documents[0]['reserva'])
+                            .output
+                            .withoutFractionDigits
+                            .toString())),
+                      ]),
+                      DataRow(cells: [
+                        DataCell(Text("Total",
+                            style: new TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15.0))),
+                        DataCell(
+                          Text(
+                              me
+                                  .formatearNumero(
+                                      data.data.documents[0]['comprometido'])
+                                  .output
+                                  .withoutFractionDigits
+                                  .toString(),
+                              style: new TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15.0)),
+                        ),
+                      ]),
+                    ],
+                    sortColumnIndex: 0,
+                    sortAscending: true,
+                  ),
+                ],
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+              )
+            ],
+          );},
           )
-        ],
-      ),
-    ]));
-  }
+              ],
+            );
+          }
 }

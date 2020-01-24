@@ -18,11 +18,14 @@ class _FirstPageState extends State<FirstPage> {
   String titulo;
   Random random = new Random();
   CloudService db = new CloudService();
-
+  Color colorRubroIngresos;
+  Color colorRubroEgresos;
   StreamSubscription<QuerySnapshot> noteSub;
   @override
   void initState() {
     super.initState();
+    colorRubroIngresos =Colors.purple;
+    colorRubroEgresos=Colors.lime[50];
     llenarLista('Ingresos');
     llenarListaDetalle('Ingresos Operativos');
     titulo = 'Ingresos Operativos';
@@ -60,7 +63,9 @@ class _FirstPageState extends State<FirstPage> {
       List<Datos> datos = snapshot.documents
           .map((documentSnapshot) => Datos.fromMap(documentSnapshot.data))
           .toList();
+      
       setState(() {
+        datos.sort((a,b)=>a.titulo.compareTo(b.titulo));
         this.lista = datos;
       });
     });
@@ -74,6 +79,7 @@ class _FirstPageState extends State<FirstPage> {
           .map((documentSnapshot) => Datos.fromMap(documentSnapshot.data))
           .toList();
       setState(() {
+         datos.sort((a,b)=>a.titulo.compareTo(b.titulo));
         this.detalleLista = datos;
       });
     });
@@ -153,11 +159,13 @@ class _FirstPageState extends State<FirstPage> {
                                       fontSize: 15.0),
                                 ),
                                 circularStrokeCap: CircularStrokeCap.round,
-                                progressColor: Colors.purple,
+                                progressColor: colorRubroIngresos,
                               )
                             ],
                           )),
                           onTap: () {
+                         colorRubroIngresos =Colors.purple;
+                          colorRubroEgresos=Colors.lime[50];
                             llenarLista('Ingresos');
                             llenarListaDetalle('Ingresos Operativos');
                             titulo = 'Ingresos Operativos';
@@ -210,11 +218,13 @@ class _FirstPageState extends State<FirstPage> {
                                       fontSize: 15.0),
                                 ),
                                 circularStrokeCap: CircularStrokeCap.round,
-                                progressColor: Colors.blue,
+                                progressColor: colorRubroEgresos,
                               )
                             ],
                           )),
                           onTap: () {
+                            colorRubroEgresos =Colors.blue;
+                            colorRubroIngresos=Colors.lime[50];
                             llenarLista('Egresos');
                             llenarListaDetalle('Gastos Operativos');
                             titulo = 'Gastos Operativos';

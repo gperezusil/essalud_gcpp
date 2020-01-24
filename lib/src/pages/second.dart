@@ -23,6 +23,7 @@ class _SecondPageState extends State<SecondPage> {
   PanelController _pc = new PanelController();
   Metodos me = new Metodos();
   Redes buscarDireccion;
+
   Widget wid;
   var data;
 
@@ -35,7 +36,9 @@ class _SecondPageState extends State<SecondPage> {
         redes.add(new Redes(data[i]['DEPARTAM'].toString(),
             data[i]['coordinates'][0], data[i]['coordinates'][1]));
       }
+      redes.sort((a,b)=>a.nomRed.compareTo(b.nomRed));
     });
+  
   }
 
   Future<void> getPermision() async {
@@ -84,17 +87,24 @@ class _SecondPageState extends State<SecondPage> {
   void initState() {
     getPermision();
     super.initState();
+    _getCurrentLocation();
     loadJsonData();
     details.add(DetalleRed(red: 'TOTAL'));
+  
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _mapWidget(context),
-    );
+        body: FutureBuilder(
+            future: _getCurrentLocation(),
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if (!snapshot.hasData) {
+                return Center(child: new CircularProgressIndicator());
+              }
+              return _mapWidget(context);
+            }));
   }
-
 
   Widget _panel(context) {
     return SingleChildScrollView(
@@ -103,14 +113,12 @@ class _SecondPageState extends State<SecondPage> {
       ),
     );
   }
-  void _getCurrentLocation() async {
-    Position res = await Geolocator().getCurrentPosition();
-    setState(() {
-      position = res;
-      wid=_mapWidget(context);
-    });
+
+  Future<dynamic> _getCurrentLocation() async {
+    return await Geolocator().getCurrentPosition().then((response) =>position=response);
   }
-   Widget _mapWidget(context) {
+
+  Widget _mapWidget(context) {
     return SlidingUpPanel(
       body: Stack(
         children: <Widget>[
@@ -131,13 +139,13 @@ class _SecondPageState extends State<SecondPage> {
                         details.clear();
                         details.add(DetalleRed(red: red.nomRed));
                         _pc.open();
+                   
                       });
                     },
                   )
             },
             myLocationButtonEnabled: false,
             rotateGesturesEnabled: false,
-            
           ),
           Positioned(
               top: 15.0,
@@ -152,6 +160,7 @@ class _SecondPageState extends State<SecondPage> {
                   padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                   child: DropdownButton<Redes>(
                     value: buscarDireccion,
+                    hint: Text("Seleccione Red"),
                     icon: Icon(Icons.arrow_drop_down),
                     iconSize: 24,
                     elevation: 16,
@@ -164,6 +173,10 @@ class _SecondPageState extends State<SecondPage> {
                                 target: LatLng(buscarDireccion.longuitud,
                                     buscarDireccion.latitude),
                                 zoom: 10.0)));
+                              details.clear();
+                        details.add(DetalleRed(red: buscarDireccion.nomRed));
+                        _pc.open();
+
                       });
                     },
                     items: redes.map<DropdownMenuItem<Redes>>((Redes valor) {
@@ -183,6 +196,7 @@ class _SecondPageState extends State<SecondPage> {
       backdropEnabled: true,
       parallaxEnabled: true,
       parallaxOffset: .5,
+      defaultPanelState: PanelState.OPEN,
     );
   }
 
@@ -193,11 +207,12 @@ class _SecondPageState extends State<SecondPage> {
     );
   }
 
-           void onMapCreated(controller) async {
-                 setState(() {
-                   _controller  =  controller; 
-                 });
+  void onMapCreated(controller) async {
+    setState(() {
+      _controller = controller;
+    });
   }
+
   @override
   void dispose() {
     super.dispose();
