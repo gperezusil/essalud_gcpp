@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/pages/first.dart';
+import 'package:gcpp_essalud/src/pages/inversiones.dart';
+import 'package:gcpp_essalud/src/pages/material.dart';
 import 'package:gcpp_essalud/src/pages/second.dart';
 import 'package:gcpp_essalud/src/pages/sede.dart';
 import 'package:hidden_drawer_menu/hidden_drawer/hidden_drawer_menu.dart';
@@ -36,7 +38,7 @@ class _HomeState extends State<HomePage>{
           baseStyle: TextStyle( color: Colors.white.withOpacity(0.8), fontSize: 16.0 ),
           colorLineSelected: Colors.teal,
         ),
-        FirstPage()));
+        MaterialEstrategico()));
           items.add(new ScreenHiddenDrawer(
         new ItemHiddenMenu(
           name: 'Sede Central',
@@ -44,13 +46,14 @@ class _HomeState extends State<HomePage>{
           colorLineSelected: Colors.teal,
         ),
         SedeCentral()));
-          items.add(new ScreenHiddenDrawer(
+           items.add(new ScreenHiddenDrawer(
         new ItemHiddenMenu(
           name: 'Inversiones',
           baseStyle: TextStyle( color: Colors.white.withOpacity(0.8), fontSize: 16.0 ),
           colorLineSelected: Colors.teal,
         ),
-        FirstPage()));
+        InversionesPage()));
+          
 
     super.initState();
   }

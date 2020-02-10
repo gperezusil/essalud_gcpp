@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      title: 'Material App',
+      title: 'Ejecucion Presupuestal',
       home: HomePage()
     );
   }

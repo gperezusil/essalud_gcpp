@@ -9,9 +9,10 @@ class CloudService{
  
   CloudService.internal();
 
-    Stream<QuerySnapshot> getListDatos(String variable,{int offset, int limit}) {
+    Stream<QuerySnapshot> getListDatos(String variable,String fecha,{int offset, int limit}) {
     Stream<QuerySnapshot> snapshots = 
     noteCollection.where('padre',isEqualTo: variable )
+    .where('anno',isEqualTo: fecha)
     .snapshots();
  
   

@@ -2,14 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:gcpp_essalud/src/util/metodos.dart';
+import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class DetalleRed extends StatefulWidget {
   final String red;
-
   const DetalleRed({Key key, this.red}) : super(key: key);
 
   static Route<dynamic> route(red) {
+    
     return MaterialPageRoute(
       builder: (context) => DetalleRed(red: red),
     );
@@ -20,6 +21,9 @@ class DetalleRed extends StatefulWidget {
 }
 
 class _DetalleRedState extends State<DetalleRed> {
+  final f = new DateFormat('dd-MM-yyyy');
+  final form = new DateFormat('dd/MM/yyyy');
+  String annoSeleccionado='2020';
   String rubro='BIENES';
   Metodos me = new Metodos();
   @override
@@ -28,6 +32,9 @@ class _DetalleRedState extends State<DetalleRed> {
     return Center(
       child: Column(
         children: <Widget>[
+          
+           SizedBox(height: 20),
+          _builCombo(context),
           Center(
             child: Padding(
               padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
@@ -41,6 +48,7 @@ class _DetalleRedState extends State<DetalleRed> {
                 .collection('Redes')
                 .where('red', isEqualTo: red)
                 .where('rubro', isEqualTo: 'SUB-TOTAL')
+                .where('anno',isEqualTo: annoSeleccionado)
                 .snapshots(),
             builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
               if (!data.hasData) {
@@ -49,17 +57,19 @@ class _DetalleRedState extends State<DetalleRed> {
               return GestureDetector(
                 child: Container(
                     child: Column(
-                  children: [
+                  children: data.data.documents.map((item){
+                    return Column(
+                      children: <Widget>[
                     new CircularPercentIndicator(
                       radius: 130.0,
                       lineWidth: 15.0,
                       animation: true,
                       percent: me.verificarNumero(
-                          data.data.documents[0]['porcentaje']),
+                          item.data['porcentaje']),
                       center: new Text(
                         me
                                 .formatearNumero(
-                                    data.data.documents[0]['porcentaje'] * 100)
+                                    item.data['porcentaje'] * 100)
                                 .output
                                 .nonSymbol
                                 .toString() +
@@ -70,7 +80,7 @@ class _DetalleRedState extends State<DetalleRed> {
                       footer: new Text(
                         me
                             .formatearNumero(
-                                data.data.documents[0]['ejecucion'])
+                                item.data['ejecucion'])
                             .output
                             .withoutFractionDigits
                             .toString(),
@@ -79,8 +89,23 @@ class _DetalleRedState extends State<DetalleRed> {
                       ),
                       circularStrokeCap: CircularStrokeCap.round,
                       progressColor: Colors.green,
-                    )
-                  ],
+                    ),
+                    SizedBox(height: 5),
+                              Text(  me.formatearNumero(
+                                           item.data['pia'])
+                                      .output
+                                      .withoutFractionDigits
+                                      .toString(),style: TextStyle(fontSize: 17,
+                                color:Colors.grey
+                              ),),
+                    SizedBox(height: 10),
+                              Text("al " + form.format(f.parse(item.data['fecha']).toLocal()),style: TextStyle(
+                                color:Colors.grey
+                              ),)
+                      ],
+                    );
+                  }).toList()
+                  ,
                 )), 
               );
             },
@@ -93,7 +118,31 @@ class _DetalleRedState extends State<DetalleRed> {
       ),
     );
   }
-
+  Widget _builCombo(context) {
+    var anno = ['2019', '2020'];
+    return  
+    Center(child:DropdownButton(
+            hint: Text("Seleccione Año"),
+            value: annoSeleccionado,
+            icon: Icon(Icons.arrow_drop_down),
+            iconSize: 24,
+            elevation: 16,
+            style: TextStyle(color: Colors.black, fontSize: 15),
+            onChanged: (String ge) {
+              setState(() {
+                annoSeleccionado=ge;
+              });
+            },
+            items: anno.map((String valor) {
+              return DropdownMenuItem<String>(
+                value: valor,
+                child: Text(
+                  valor,
+                  style: TextStyle(color: Colors.black, fontSize: 12),
+                ),
+              );
+            }).toList()));
+  }
   Widget detalleRedes(context, String red) {
     return Wrap(
       children: <Widget>[
@@ -102,7 +151,8 @@ class _DetalleRedState extends State<DetalleRed> {
               .collection('Redes')
               .where('red', isEqualTo: red)
               .where('rubro',
-                  whereIn: ['PERSONAL', 'BIENES', 'SERVICIOS']).snapshots(),
+                  whereIn: ['PERSONAL', 'BIENES', 'SERVICIOS'])
+                   .where('anno',isEqualTo: annoSeleccionado).snapshots(),
           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
             if (!data.hasData) {
               return Center(child: new CircularProgressIndicator());
@@ -117,7 +167,9 @@ class _DetalleRedState extends State<DetalleRed> {
                         
                     return new Wrap(children: <Widget>[
                       GestureDetector(
-                        child: CircularPercentIndicator(
+                        child: Column(
+                          children: <Widget>[
+                                                    CircularPercentIndicator(
                           radius: 90.0,
                           lineWidth: 10.0,
                           animation: true,
@@ -152,6 +204,15 @@ class _DetalleRedState extends State<DetalleRed> {
                           ),
                           circularStrokeCap: CircularStrokeCap.round,
                           progressColor: Colors.blue,
+                        ),   SizedBox(height: 5),
+                              Text(  me.formatearNumero(
+                                           item.data['pia'])
+                                      .output
+                                      .withoutFractionDigits
+                                      .toString(),style: TextStyle(fontSize: 14,
+                                color:Colors.grey
+                              ),),
+                          ],
                         ),
                         onTap: () {
                           setState(() {
@@ -178,15 +239,18 @@ class _DetalleRedState extends State<DetalleRed> {
                 .collection('Redes')
                 .where('red', isEqualTo: red)
                 .where('rubro', isEqualTo: rubro)
+                 .where('anno',isEqualTo: annoSeleccionado)
                 .snapshots(),
             builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
               if (!data.hasData) {
                 return Center(child: new CircularProgressIndicator());
               }
       return Wrap(
-            children: <Widget>[
+            children: data.data.documents.map((item){
+                return Column(
+                  children: <Widget>[
               Center(
-                child:  Text(data.data.documents[0]['rubro'],
+                child:  Text(item.data['rubro'],
                             style: new TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 15.0)
                                 ),
@@ -202,7 +266,7 @@ class _DetalleRedState extends State<DetalleRed> {
                       DataRow(cells: [
                         DataCell(Text("Solicitud de Pedidos")),
                         DataCell(Text(me
-                            .formatearNumero(data.data.documents[0]['solped'])
+                            .formatearNumero(item.data['solped'])
                             .output
                             .withoutFractionDigits
                             .toString())),
@@ -210,7 +274,7 @@ class _DetalleRedState extends State<DetalleRed> {
                       DataRow(cells: [
                         DataCell(Text("Pedidos")),
                         DataCell(Text(me
-                            .formatearNumero(data.data.documents[0]['pedido'])
+                            .formatearNumero(item.data['pedido'])
                             .output
                             .withoutFractionDigits
                             .toString())),
@@ -218,7 +282,7 @@ class _DetalleRedState extends State<DetalleRed> {
                       DataRow(cells: [
                         DataCell(Text("Reservas")),
                         DataCell(Text(me
-                            .formatearNumero(data.data.documents[0]['reserva'])
+                            .formatearNumero(item.data['reserva'])
                             .output
                             .withoutFractionDigits
                             .toString())),
@@ -231,7 +295,7 @@ class _DetalleRedState extends State<DetalleRed> {
                           Text(
                               me
                                   .formatearNumero(
-                                      data.data.documents[0]['comprometido'])
+                                      item.data['comprometido'])
                                   .output
                                   .withoutFractionDigits
                                   .toString(),
@@ -247,7 +311,10 @@ class _DetalleRedState extends State<DetalleRed> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
               )
-            ],
+                  ],
+                );
+            }).toList()
+            ,
           );},
           )
               ],

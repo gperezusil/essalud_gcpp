@@ -7,7 +7,6 @@ import 'package:gcpp_essalud/src/util/metodos.dart';
 import 'package:gcpp_essalud/src/pages/detalleRed.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class SecondPage extends StatefulWidget {
@@ -41,36 +40,7 @@ class _SecondPageState extends State<SecondPage> {
   
   }
 
-  Future<void> getPermision() async {
-    PermissionStatus permision = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.location);
-    if (permision == PermissionStatus.denied) {
-      await PermissionHandler()
-          .requestPermissions([PermissionGroup.locationAlways]);
-    }
-    var geolocator = Geolocator();
-
-    GeolocationStatus geolocationStatus =
-        await geolocator.checkGeolocationPermissionStatus();
-
-    switch (geolocationStatus) {
-      case GeolocationStatus.denied:
-        showToast('Acceso Denegado');
-        break;
-      case GeolocationStatus.disabled:
-        showToast('Desactivado');
-        break;
-      case GeolocationStatus.restricted:
-        showToast('No permitido');
-        break;
-      case GeolocationStatus.unknown:
-        showToast('Desconocido');
-        break;
-      case GeolocationStatus.granted:
-        showToast('Acceso Permitido');
-        _getCurrentLocation();
-    }
-  }
+ 
 
   void showToast(message) {
     Fluttertoast.showToast(
@@ -85,9 +55,7 @@ class _SecondPageState extends State<SecondPage> {
 
   @override
   void initState() {
-    getPermision();
     super.initState();
-    _getCurrentLocation();
     loadJsonData();
     details.add(DetalleRed(red: 'TOTAL'));
   
@@ -108,18 +76,20 @@ class _SecondPageState extends State<SecondPage> {
 
   Widget _panel(context) {
     return SingleChildScrollView(
-      child: Column(
-        children: details,
-      ),
+        child: Column(
+          children: details,
+        ),
     );
   }
 
-  Future<dynamic> _getCurrentLocation() async {
-    return await Geolocator().getCurrentPosition().then((response) =>position=response);
+  Future<Position> _getCurrentLocation() async {
+    await Geolocator().getCurrentPosition().then((response) =>position=response);
+    return position;
   }
 
   Widget _mapWidget(context) {
     return SlidingUpPanel(
+      maxHeight:MediaQuery.of(context).size.height * .70 ,
       body: Stack(
         children: <Widget>[
           GoogleMap(
