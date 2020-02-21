@@ -75,7 +75,7 @@ class _FirstPageState extends State<FirstPage> {
       List<Datos> datos = snapshot.documents
           .map((documentSnapshot) => Datos.fromMap(documentSnapshot.data))
           .toList();
-
+      
       setState(() {
         datos.sort((a, b) => a.titulo.compareTo(b.titulo));
         this.lista = datos;

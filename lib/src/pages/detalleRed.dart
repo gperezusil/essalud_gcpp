@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gcpp_essalud/src/services/firestore.dart';
 
 import 'package:gcpp_essalud/src/util/metodos.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +19,7 @@ class DetalleRed extends StatefulWidget {
 
   @override
   _DetalleRedState createState() => _DetalleRedState();
+
 }
 
 class _DetalleRedState extends State<DetalleRed> {
@@ -26,9 +28,12 @@ class _DetalleRedState extends State<DetalleRed> {
   String annoSeleccionado='2020';
   String rubro='BIENES';
   Metodos me = new Metodos();
+  CloudService cloud = new CloudService();
+  List<dynamic> prueba = new List();
   @override
   Widget build(BuildContext context) {
     String red = widget.red;
+    listarDatos('PruebaRedes','ALMENARA');
     return Center(
       child: Column(
         children: <Widget>[
@@ -43,17 +48,13 @@ class _DetalleRedState extends State<DetalleRed> {
                       fontWeight: FontWeight.bold, fontSize: 20.0)),
             ),
           ),
-          StreamBuilder<QuerySnapshot>(
-            stream: Firestore.instance
-                .collection('Redes')
-                .where('red', isEqualTo: red)
-                .where('rubro', isEqualTo: 'SUB-TOTAL')
-                .where('anno',isEqualTo: annoSeleccionado)
-                .snapshots(),
-            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
+          FutureBuilder(
+            future: listarDatos('PruebaRedes', red),
+            builder: (BuildContext context, AsyncSnapshot data) {
               if (!data.hasData) {
                 return Center(child: new CircularProgressIndicator());
               }
+              prueba = data.data.where((f)=>f['red']==red && f['anno']==annoSeleccionado).toList();
               return GestureDetector(
                 child: Container(
                     child: Column(
@@ -320,4 +321,24 @@ class _DetalleRedState extends State<DetalleRed> {
               ],
             );
           }
+
+  Future<List<dynamic>> listarDatos(String coleccion,String variable) async
+  {
+      List<dynamic> aux = new List();
+    cloud.listarDatos(coleccion)
+        .listen((QuerySnapshot snapshot) {
+            snapshot.documents.map((f){
+              f.data.values.map((d){
+               aux.add(d);     
+                }).toList();
+              }).toList();
+      
+        
+
+    });
+
+    return aux;
+  }
+
+
 }

@@ -12,8 +12,7 @@ class InversionesPage extends StatefulWidget {
 }
 
 class _InversionesPageState extends State<InversionesPage> {
-
-  String rubro1,rubro2;
+  String rubro1, rubro2;
   Color colorInversiones;
   final f = new DateFormat('dd-MM-yyyy');
   final form = new DateFormat('dd/MM/yyyy');
@@ -25,8 +24,8 @@ class _InversionesPageState extends State<InversionesPage> {
     super.initState();
     colorInversiones = Colors.blueGrey;
     annoSeleccionado = '2020';
-    rubro1='3.1.1  Proyectos de Inversión';
-    rubro2='Obras';
+    rubro1 = '3.1.1  Proyectos de Inversión';
+    rubro2 = 'Obras';
     anno = new List();
     anno.add('2020');
   }
@@ -49,7 +48,7 @@ class _InversionesPageState extends State<InversionesPage> {
             SizedBox(height: 20),
             _buildetalle(context),
             SizedBox(height: 20),
-             _buildetalledetalle(context) 
+            _buildetalledetalle(context)
           ],
         ),
       ),
@@ -59,10 +58,6 @@ class _InversionesPageState extends State<InversionesPage> {
   FlutterMoneyFormatter formatearNumero(double variable) {
     return FlutterMoneyFormatter(amount: variable.toDouble());
   }
-
-
-
-
 
   @override
   void dispose() {
@@ -139,14 +134,17 @@ class _InversionesPageState extends State<InversionesPage> {
                               ),
                               circularStrokeCap: CircularStrokeCap.round,
                               progressColor: colorInversiones,
-                            ),SizedBox(height: 5),
-                              Text(  me.formatearNumero(
-                                           item.data['pia'])
-                                      .output
-                                      .withoutFractionDigits
-                                      .toString(),style: TextStyle(fontSize: 17,
-                                color:Colors.grey
-                              ),),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              me
+                                  .formatearNumero(item.data['pia'])
+                                  .output
+                                  .withoutFractionDigits
+                                  .toString(),
+                              style:
+                                  TextStyle(fontSize: 17, color: Colors.grey),
+                            ),
                             SizedBox(height: 10),
                             Text(
                               "al " +
@@ -224,13 +222,14 @@ class _InversionesPageState extends State<InversionesPage> {
                             progressColor: Colors.deepOrangeAccent,
                           ),
                           SizedBox(height: 5),
-                              Text(  me.formatearNumero(
-                                           item.data['pia'])
-                                      .output
-                                      .withoutFractionDigits
-                                      .toString(),style: TextStyle(fontSize: 14,
-                                color:Colors.grey
-                              ),),
+                          Text(
+                            me
+                                .formatearNumero(item.data['pia'])
+                                .output
+                                .withoutFractionDigits
+                                .toString(),
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
                         ],
                       );
                     }).toList()));
@@ -266,7 +265,7 @@ class _InversionesPageState extends State<InversionesPage> {
   }
 
   Widget _buildCardDetalleIngresosOperativos(context) {
-        return Wrap(
+    return Wrap(
       alignment: WrapAlignment.center,
       spacing: 20.0, // gap between adjacent chips
       runSpacing: 8.0, // gap between lines
@@ -283,92 +282,106 @@ class _InversionesPageState extends State<InversionesPage> {
             }
             return Column(
               children: <Widget>[
-                Text('3.1 Presupuesto de Inversiones  -FBK', 
-                              style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
-                            ),
-                             SizedBox(height: 20),
+                Text(
+                  '3.1 Presupuesto de Inversiones  -FBK',
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 20),
                 Container(
-                child: Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 20.0, // gap between adjacent chips
-                    runSpacing: 8.0,
-                    children: data.data.documents.map((item) {
-                      return Column(
-                        children: <Widget>[
-                          GestureDetector(
-                            child: 
-                            Column(
-                              children: <Widget>[
-                                                            new CircularPercentIndicator(
-                            radius: 90.0,
-                            lineWidth: 9.0,
-                            animation: true,
-                            percent: verificarNumero(item.data['porcentaje']),
-                            center: new Text(
-                              formatearNumero(item.data['porcentaje'] * 100)
-                                      .output
-                                      .compactNonSymbol
-                                      .toString() +
-                                  '%',
-                              style: new TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15.0),
-                            ),
-                            header: Text(item.data['rubro'].toString(),
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                )),
-                            footer: new Text(
-                              formatearNumero(item.data['ejecucion'])
-                                  .output
-                                  .withoutFractionDigits
-                                  .toString(),
-                              style: new TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16.0),
-                            ),
-                            circularStrokeCap: CircularStrokeCap.round,
-                            progressColor: Colors.blue,
-                          ),
-                                SizedBox(height: 5),
-                              Text(  me.formatearNumero(
-                                           item.data['pia'])
-                                      .output
-                                      .withoutFractionDigits
-                                      .toString(),style: TextStyle(fontSize: 12,
-                                color:Colors.grey
-                              ),),
-                              ],
-                            ), 
-                          onTap: (){
-                            setState(() {
-                              rubro1=item.data['rubro'];
-                              if(item.data['rubro']=='3.1.1  Proyectos de Inversión'){
-                                 rubro2='Obras';
-                              }else{
-                              rubro2='Gastos de Capital Diversos';}
-                            });
-                          },
-                          )
-                        ],
-                      );
-                    }).toList()))
+                    child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 20.0, // gap between adjacent chips
+                        runSpacing: 8.0,
+                        children: data.data.documents.map((item) {
+                          return Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                child: Column(
+                                  children: <Widget>[
+                                    new CircularPercentIndicator(
+                                      radius: 90.0,
+                                      lineWidth: 9.0,
+                                      animation: true,
+                                      percent: verificarNumero(
+                                          item.data['porcentaje']),
+                                      center: new Text(
+                                        formatearNumero(
+                                                    item.data['porcentaje'] *
+                                                        100)
+                                                .output
+                                                .compactNonSymbol
+                                                .toString() +
+                                            '%',
+                                        style: new TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15.0),
+                                      ),
+                                      header:
+                                          Text(item.data['rubro'].toString(),
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              )),
+                                      footer: new Text(
+                                        formatearNumero(item.data['ejecucion'])
+                                            .output
+                                            .withoutFractionDigits
+                                            .toString(),
+                                        style: new TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16.0),
+                                      ),
+                                      circularStrokeCap:
+                                          CircularStrokeCap.round,
+                                      progressColor: Colors.blue,
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      me
+                                          .formatearNumero(item.data['pia'])
+                                          .output
+                                          .withoutFractionDigits
+                                          .toString(),
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    rubro1 = item.data['rubro'];
+                                    if (item.data['rubro'] ==
+                                        '3.1.1  Proyectos de Inversión') {
+                                      rubro2 = 'Obras';
+                                    } else {
+                                      rubro2 = 'Gastos de Capital Diversos';
+                                    }
+                                  });
+                                },
+                              )
+                            ],
+                          );
+                        }).toList()))
               ],
             );
-            
           },
         )
       ],
     );
   }
-    Widget _buildetalle(context) {
-        return Wrap(
+
+  Widget _buildetalle(context) {
+    return Wrap(
       alignment: WrapAlignment.center,
       spacing: 20.0, // gap between adjacent chips
       runSpacing: 8.0, // gap between lines
-      children: [Text(rubro1, 
-                              style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
-                            ),
-                             SizedBox(height: 20),
+      children: [
+        Text(
+          rubro1,
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 20),
         StreamBuilder<QuerySnapshot>(
           stream: Firestore.instance
               .collection('Inversiones')
@@ -379,7 +392,9 @@ class _InversionesPageState extends State<InversionesPage> {
             if (!data.hasData) {
               return Text('Cargando Informacion');
             }
-            data.data.documents.sort((a,b)=> a.data['rubro'].toString().compareTo(b.data['rubro'].toString()));
+            data.data.documents.sort((a, b) => a.data['rubro']
+                .toString()
+                .compareTo(b.data['rubro'].toString()));
             return Container(
                 child: Wrap(
                     alignment: WrapAlignment.center,
@@ -389,55 +404,71 @@ class _InversionesPageState extends State<InversionesPage> {
                       return Column(
                         children: <Widget>[
                           GestureDetector(
-                            child:  
-                            Column(
+                            child: Column(
                               children: <Widget>[
-                            new CircularPercentIndicator(
-                            radius: 
-                            80.0,
-                            lineWidth: 9.0,
-                            animation: true,
-                            percent: verificarNumero(item.data['porcentaje']),
-                            center: new Text(
-                              formatearNumero(item.data['porcentaje'] * 100)
-                                      .output
-                                      .compactNonSymbol
-                                      .toString() +
-                                  '%',
-                              style: new TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15.0),
-                            ),
-                            header: Text(item.data['rubro'].toString(),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                )),
-                            footer: new Text(
-                              formatearNumero(item.data['ejecucion'])
-                                  .output
-                                  .withoutFractionDigits
-                                  .toString(),
-                              style: new TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15.0),
-                            ),
-                            circularStrokeCap: CircularStrokeCap.round,
-                            progressColor: Colors.green,
-                          ), SizedBox(height: 5),
-                              Text(  me.formatearNumero(
-                                           item.data['pia'])
+                                new CircularPercentIndicator(
+                                  radius: 80.0,
+                                  lineWidth: 9.0,
+                                  animation: true,
+                                  percent:
+                                      verificarNumero(item.data['porcentaje']),
+                                  center: new Text(
+                                    formatearNumero(
+                                                item.data['porcentaje'] * 100)
+                                            .output
+                                            .compactNonSymbol
+                                            .toString() +
+                                        '%',
+                                    style: new TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15.0),
+                                  ),
+                                  header: Text(item.data['rubro'].toString(),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                  footer: new Text(
+                                    formatearNumero(item.data['ejecucion'])
+                                        .output
+                                        .withoutFractionDigits
+                                        .toString(),
+                                    style: new TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15.0),
+                                  ),
+                                  circularStrokeCap: CircularStrokeCap.round,
+                                  progressColor: Colors.green,
+                                ),
+                                SizedBox(height: 5),
+                                Text(
+                                  me
+                                      .formatearNumero(item.data['pia'])
                                       .output
                                       .withoutFractionDigits
-                                      .toString(),style: TextStyle(fontSize: 12,
-                                color:Colors.grey
-                              ),),
+                                      .toString(),
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                ),
                               ],
-                            )
-,
-                          onTap: (){
-                            setState(() {
-                              rubro2=item.data['rubro'];
-                            });
-                          },
+                            ),
+                            onTap: () {
+                              setState(() {
+                                rubro2 = item.data['rubro'];
+                              });
+                            },
+                            onDoubleTap: () {
+                              if (item.data['rubro'] == 'Obras') {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute<Null>(
+                                      builder: (BuildContext context) {
+                                        return MyWiget2();
+                                      },
+                                      fullscreenDialog: true,
+                                    ));
+                              }
+                            },
                           )
                         ],
                       );
@@ -447,94 +478,231 @@ class _InversionesPageState extends State<InversionesPage> {
       ],
     );
   }
-    Widget _buildetalledetalle(context) {
-            return 
-            Column(
-              children: <Widget>[
-                StreamBuilder<QuerySnapshot>(
-            stream: Firestore.instance
-                .collection('Inversiones')
-                .where('red', isEqualTo: rubro1)
-                .where('rubro', isEqualTo: rubro2)
-                 .where('anno',isEqualTo: annoSeleccionado)
-                .snapshots(),
-            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
-              if (!data.hasData) {
-                return Center(child: new CircularProgressIndicator());
-              }
-      return Wrap(
-            children: data.data.documents.map((item){
+
+  Widget _buildetalledetalle(context) {
+    return Column(
+      children: <Widget>[
+        StreamBuilder<QuerySnapshot>(
+          stream: Firestore.instance
+              .collection('Inversiones')
+              .where('red', isEqualTo: rubro1)
+              .where('rubro', isEqualTo: rubro2)
+              .where('anno', isEqualTo: annoSeleccionado)
+              .snapshots(),
+          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
+            if (!data.hasData) {
+              return Center(child: new CircularProgressIndicator());
+            }
+            return Wrap(
+              children: data.data.documents.map((item) {
                 return Column(
                   children: <Widget>[
-              Center(
-                child:  Text(item.data['rubro'],
-                            style: new TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15.0)
-                                ),
-              ),
-              Row(
-                children: <Widget>[
-                  DataTable(
-                    columns: [
-                      DataColumn(label: Text("Tipo de Compromisos")),
-                      DataColumn(label: Text("Soles"))
-                    ],
-                    rows: [
-                      DataRow(cells: [
-                        DataCell(Text("Solicitud de Pedidos")),
-                        DataCell(Text(me
-                            .formatearNumero(item.data['solped'])
-                            .output
-                            .withoutFractionDigits
-                            .toString())),
-                      ]),
-                      DataRow(cells: [
-                        DataCell(Text("Pedidos")),
-                        DataCell(Text(me
-                            .formatearNumero(item.data['pedido'])
-                            .output
-                            .withoutFractionDigits
-                            .toString())),
-                      ]),
-                      DataRow(cells: [
-                        DataCell(Text("Reservas")),
-                        DataCell(Text(me
-                            .formatearNumero(item.data['reserva'])
-                            .output
-                            .withoutFractionDigits
-                            .toString())),
-                      ]),
-                      DataRow(cells: [
-                        DataCell(Text("Total",
-                            style: new TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15.0))),
-                        DataCell(
-                          Text(
-                              me
-                                  .formatearNumero(
-                                      item.data['comprometido'])
+                    Center(
+                      child: Text(item.data['rubro'],
+                          style: new TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15.0)),
+                    ),
+                    Row(
+                      children: <Widget>[
+                        DataTable(
+                          columns: [
+                            DataColumn(label: Text("Tipo de Compromisos")),
+                            DataColumn(label: Text("Soles"))
+                          ],
+                          rows: [
+                            DataRow(cells: [
+                              DataCell(Text("Solicitud de Pedidos")),
+                              DataCell(Text(me
+                                  .formatearNumero(item.data['solped'])
                                   .output
                                   .withoutFractionDigits
-                                  .toString(),
-                              style: new TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15.0)),
+                                  .toString())),
+                            ]),
+                            DataRow(cells: [
+                              DataCell(Text("Pedidos")),
+                              DataCell(Text(me
+                                  .formatearNumero(item.data['pedido'])
+                                  .output
+                                  .withoutFractionDigits
+                                  .toString())),
+                            ]),
+                            DataRow(cells: [
+                              DataCell(Text("Reservas")),
+                              DataCell(Text(me
+                                  .formatearNumero(item.data['reserva'])
+                                  .output
+                                  .withoutFractionDigits
+                                  .toString())),
+                            ]),
+                            DataRow(cells: [
+                              DataCell(Text("Total",
+                                  style: new TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15.0))),
+                              DataCell(
+                                Text(
+                                    me
+                                        .formatearNumero(
+                                            item.data['comprometido'])
+                                        .output
+                                        .withoutFractionDigits
+                                        .toString(),
+                                    style: new TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15.0)),
+                              ),
+                            ]),
+                          ],
+                          sortColumnIndex: 0,
+                          sortAscending: true,
                         ),
-                      ]),
-                    ],
-                    sortColumnIndex: 0,
-                    sortAscending: true,
-                  ),
-                ],
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-              )
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                    )
                   ],
                 );
-            }).toList()
-            ,
-          );},
-          )
-              ],
+              }).toList(),
             );
+          },
+        )
+      ],
+    );
+  }
+}
+
+class MyWiget2 extends StatefulWidget {
+  @override
+  _MyWiget2State createState() => _MyWiget2State();
+}
+
+class _MyWiget2State extends State<MyWiget2> {
+  Metodos me = Metodos();
+  List<String> valores;
+  List<dynamic> resultado;
+  String nomRed;
+  @override
+  @override
+  void initState() {
+    super.initState();
+    nomRed='LIMA';
+    listar();
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(title: Text("Detalle")),
+        body: Container(
+            color: Colors.white,
+            child: SingleChildScrollView(
+                child: Column(
+              children: <Widget>[
+                _builCombo(context),
+                _buildObras(context)
+              ],
+            ))));
+  }
+
+  Future<List<dynamic>> listar() async {
+    List<String> aux = new List();
+    valores = new List();
+    resultado = new List();
+    Firestore.instance
+        .collection('Obras')
+        .snapshots()
+        .listen((QuerySnapshot snapshot) {
+      snapshot.documents
+          .map((f) => {
+                f.data.values.map((d) {
+                  setState(() {
+                    aux.add(d['red']);
+                    valores = aux.toSet().toList();
+                    resultado.add(d);
+                  });
+                }).toList()
+              })
+          .toList();
+    });
+
+    return resultado;
+  }
+
+  Widget _builCombo(context) {
+    return Center(
+        child: DropdownButton<String>(
+            hint: Text("Seleccione Departamento"),
+            value: nomRed,
+            icon: Icon(Icons.arrow_drop_down),
+            iconSize: 24,
+            elevation: 16,
+            style: TextStyle(color: Colors.black, fontSize: 15),
+            onChanged: (String ge) {
+              setState(() {
+                nomRed = ge;
+              });
+            },
+            items: valores.map<DropdownMenuItem<String>>((String valor) {
+              return DropdownMenuItem<String>(
+                value: valor,
+                child: Text(
+                  valor,
+                  style: TextStyle(color: Colors.black, fontSize: 12),
+                ),
+              );
+            }).toList()));
+  }
+
+  Widget _buildObras(context) {
+    List<dynamic> prueba = new List();
+    return Center(
+        child: FutureBuilder(
+            future: listar(),
+            builder: (BuildContext context, AsyncSnapshot data) {
+              if (data.data == null) {
+                return Text("Sin datos");
+              }
+              prueba = data.data.where((f)=>f['red']==nomRed).toList();
+              return Column(
+                children: prueba.map<Widget>((f){
+                  return Column(
+                    children: <Widget>[
+                        SizedBox(height: 20),
+                    new CircularPercentIndicator(
+                              radius: 120.0,
+                              lineWidth: 13.0,
+                              animation: true,
+                              percent: me.verificarNumero(f['porcentaje']),
+                              center: new Text(
+                                me.formatearNumero(f['porcentaje'] * 100)
+                                        .output
+                                        .compactNonSymbol
+                                        .toString() +
+                                    '%',
+                                style: new TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20.0),
+                              ),
+                              header: Text(f['nombreObra'].toString(),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                  ),textAlign: TextAlign.center,),
+                              footer: new Text(
+                                me.formatearNumero(f['ejecucion'])
+                                    .output
+                                    .withoutFractionDigits
+                                    .toString(),
+                                style: new TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15.0),
+                              ),
+                              circularStrokeCap: CircularStrokeCap.round,
+                              progressColor: Colors.lightGreen,
+                            )
+                    
+                    ],
+                  );
+                }).toList()
+              );
+            }));
   }
 }

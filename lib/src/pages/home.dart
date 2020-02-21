@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/pages/first.dart';
 import 'package:gcpp_essalud/src/pages/inversiones.dart';
 import 'package:gcpp_essalud/src/pages/material.dart';
+import 'package:gcpp_essalud/src/pages/ranking.dart';
 import 'package:gcpp_essalud/src/pages/second.dart';
 import 'package:gcpp_essalud/src/pages/sede.dart';
 import 'package:hidden_drawer_menu/hidden_drawer/hidden_drawer_menu.dart';
@@ -14,7 +16,16 @@ class _HomeState extends State<HomePage>{
    List<ScreenHiddenDrawer> items = new List();
 @override
   void initState() {
-    items.add(new ScreenHiddenDrawer(
+    
+
+    super.initState();
+  }
+
+Future< List<ScreenHiddenDrawer>> iniciarSesion()async{
+   items = new List();
+ await FirebaseAuth.instance.signInAnonymously()
+        .then((AuthResult user){
+        items.add(new ScreenHiddenDrawer(
         new ItemHiddenMenu(
           name: 'Institucional',
           baseStyle:
@@ -53,14 +64,29 @@ class _HomeState extends State<HomePage>{
           colorLineSelected: Colors.teal,
         ),
         InversionesPage()));
-          
+       items.add(new ScreenHiddenDrawer(
+        new ItemHiddenMenu(
+          name: 'Ranking',
+          baseStyle: TextStyle( color: Colors.white.withOpacity(0.8), fontSize: 16.0 ),
+          colorLineSelected: Colors.teal,
+        ),
+        RankingChart.withSampleData()));
+        })
+        .catchError((e){
+        print(e);
+      });
 
-    super.initState();
-  }
-
+      return items;
+}
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: iniciarSesion(),
+      builder: (BuildContext context,
+                        AsyncSnapshot data) {
+        if(data.data!=null)
+        {
      return WillPopScope(
        onWillPop: ()async =>false,
        child: HiddenDrawerMenu(
@@ -84,6 +110,24 @@ class _HomeState extends State<HomePage>{
         //    enableShadowItensMenu: true,
         
     ));
+        }  
+        else{
+          return Scaffold(
+            body: Container(
+              child:    Center(
+              child:  new CircularProgressIndicator(),
+              
+            ) ,
+            ) 
+
+ 
+          );
+
+            
+        }                
+                        }
+    );
+
   }
 
 
