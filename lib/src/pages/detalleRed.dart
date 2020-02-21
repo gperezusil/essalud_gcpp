@@ -54,11 +54,11 @@ class _DetalleRedState extends State<DetalleRed> {
               if (!data.hasData) {
                 return Center(child: new CircularProgressIndicator());
               }
-              prueba = data.data.where((f)=>f['red']==red && f['anno']==annoSeleccionado).toList();
+              prueba = data.data.where((f)=>f['red']==red && f['anno']==annoSeleccionado && f['rubro']=='SUB-TOTAL').toList();
               return GestureDetector(
                 child: Container(
                     child: Column(
-                  children: data.data.documents.map((item){
+                  children: prueba.map((item){
                     return Column(
                       children: <Widget>[
                     new CircularPercentIndicator(
@@ -66,11 +66,11 @@ class _DetalleRedState extends State<DetalleRed> {
                       lineWidth: 15.0,
                       animation: true,
                       percent: me.verificarNumero(
-                          item.data['porcentaje']),
+                          item['porcentaje']),
                       center: new Text(
                         me
                                 .formatearNumero(
-                                    item.data['porcentaje'] * 100)
+                                    item['porcentaje'] * 100)
                                 .output
                                 .nonSymbol
                                 .toString() +
@@ -81,7 +81,7 @@ class _DetalleRedState extends State<DetalleRed> {
                       footer: new Text(
                         me
                             .formatearNumero(
-                                item.data['ejecucion'])
+                                item['ejecucion'])
                             .output
                             .withoutFractionDigits
                             .toString(),
@@ -93,14 +93,14 @@ class _DetalleRedState extends State<DetalleRed> {
                     ),
                     SizedBox(height: 5),
                               Text(  me.formatearNumero(
-                                           item.data['pia'])
+                                           item['pia'])
                                       .output
                                       .withoutFractionDigits
                                       .toString(),style: TextStyle(fontSize: 17,
                                 color:Colors.grey
                               ),),
                     SizedBox(height: 10),
-                              Text("al " + form.format(f.parse(item.data['fecha']).toLocal()),style: TextStyle(
+                              Text("al " + form.format(f.parse(item['fecha']).toLocal()),style: TextStyle(
                                 color:Colors.grey
                               ),)
                       ],
