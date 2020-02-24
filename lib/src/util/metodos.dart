@@ -34,4 +34,12 @@ class Metodos{
  String mayuscula(String s){
     return  s[0].toUpperCase() + s.substring(1);
   }
+
+    num verificarNumero2(num numero) {
+    if (1 - numero < 0) {
+      return 0.99;
+    } else {
+      return numero;
+    }
+  }
 }

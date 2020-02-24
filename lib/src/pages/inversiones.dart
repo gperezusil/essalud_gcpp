@@ -1,5 +1,7 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gcpp_essalud/src/services/firestore.dart';
 
 import 'package:gcpp_essalud/src/util/metodos.dart';
 import 'package:intl/intl.dart';
@@ -19,9 +21,17 @@ class _InversionesPageState extends State<InversionesPage> {
   Metodos me = new Metodos();
   List<String> anno;
   String annoSeleccionado;
+  Future<List<dynamic>> datos;
+  CloudService cloud = new CloudService();
+  List<dynamic> prueba = new List();
+  List<dynamic> prueba2 = new List();
+  List<dynamic> prueba3 = new List();
+  List<dynamic> prueba4 = new List();
+  List<dynamic> prueba5 = new List();
   @override
   void initState() {
     super.initState();
+    listar();
     colorInversiones = Colors.blueGrey;
     annoSeleccionado = '2020';
     rubro1 = '3.1.1  Proyectos de Inversión';
@@ -55,9 +65,20 @@ class _InversionesPageState extends State<InversionesPage> {
     ));
   }
 
-  FlutterMoneyFormatter formatearNumero(double variable) {
-    return FlutterMoneyFormatter(amount: variable.toDouble());
-  }
+   listar() async {
+   cloud.listarDatos('PruebaInversiones').listen((QuerySnapshot snapshot) {
+             List<dynamic> aux = new List();
+            snapshot.documents.map((f){
+              f.data.values.map((d){
+               aux.add(d);    
+                }).toList();
+                setState(() {
+                datos = cloud.convertir(aux); 
+              });
+              }).toList();
+              
+    });
+}
 
   @override
   void dispose() {
@@ -86,30 +107,28 @@ class _InversionesPageState extends State<InversionesPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance
-                        .collection('Inversiones')
-                        .where('red', isEqualTo: 'Total Gastos')
-                        .where('rubro', isEqualTo: 'Total Gastos de Capital')
-                        .where('anno', isEqualTo: annoSeleccionado)
-                        .snapshots(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> data) {
-                      if (!data.hasData) {
-                        return Text('Cargando Informacion');
-                      }
+                   FutureBuilder(
+                      future: datos,
+                      builder: (BuildContext context,
+                          AsyncSnapshot data) {
+                        if (!data.hasData) {
+                          return Center(child: new CircularProgressIndicator());
+                        }
+                        prueba = data.data.where((f)=>f['red']=='Total Gastos' 
+                        && f['anno']==annoSeleccionado
+                        && f['rubro']=='Total Gastos de Capital').toList();
                       return Container(
                           child: Column(
-                              children: data.data.documents.map((item) {
+                              children:prueba.map((item) {
                         return Column(
                           children: <Widget>[
                             new CircularPercentIndicator(
                               radius: 120.0,
                               lineWidth: 13.0,
                               animation: true,
-                              percent: verificarNumero(item.data['porcentaje']),
+                              percent: verificarNumero(item['porcentaje']),
                               center: new Text(
-                                formatearNumero(item.data['porcentaje'] * 100)
+                                me.formatearNumero(item['porcentaje'] * 100)
                                         .output
                                         .compactNonSymbol
                                         .toString() +
@@ -118,13 +137,13 @@ class _InversionesPageState extends State<InversionesPage> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20.0),
                               ),
-                              header: Text(item.data['rubro'].toString(),
+                              header: Text(item['rubro'].toString(),
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   )),
                               footer: new Text(
-                                formatearNumero(item.data['ejecucion'])
+                                me.formatearNumero(item['ejecucion'])
                                     .output
                                     .withoutFractionDigits
                                     .toString(),
@@ -138,7 +157,7 @@ class _InversionesPageState extends State<InversionesPage> {
                             SizedBox(height: 5),
                             Text(
                               me
-                                  .formatearNumero(item.data['pia'])
+                                  .formatearNumero(item['pia'])
                                   .output
                                   .withoutFractionDigits
                                   .toString(),
@@ -149,7 +168,7 @@ class _InversionesPageState extends State<InversionesPage> {
                             Text(
                               "al " +
                                   form.format(
-                                      f.parse(item.data['fecha']).toLocal()),
+                                      f.parse(item['fecha']).toLocal()),
                               style: TextStyle(color: Colors.grey),
                             )
                           ],
@@ -173,31 +192,32 @@ class _InversionesPageState extends State<InversionesPage> {
       spacing: 20.0, // gap between adjacent chips
       runSpacing: 8.0, // gap between lines
       children: [
-        StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance
-              .collection('Inversiones')
-              .where('red', isEqualTo: 'Total Gastos de Capital')
-              .where('anno', isEqualTo: annoSeleccionado)
-              .snapshots(),
-          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
-            if (!data.hasData) {
-              return Text('Cargando Informacion');
-            }
+       FutureBuilder(
+                      future: datos,
+                      builder: (BuildContext context,
+                          AsyncSnapshot data) {
+                        if (!data.hasData) {
+                          return Center(child: new CircularProgressIndicator());
+                        }
+                        prueba2 = data.data.where((f)=>
+                        f['anno']==annoSeleccionado
+                        && f['red']=='Total Gastos de Capital').toList();
+                        prueba2.sort((a,b)=>a['rubro'].toString().compareTo(b['rubro'].toString()));
             return Container(
                 child: Wrap(
                     alignment: WrapAlignment.center,
                     spacing: 20.0, // gap between adjacent chips
                     runSpacing: 8.0,
-                    children: data.data.documents.map((item) {
+                    children: prueba2.map((item) {
                       return Column(
                         children: <Widget>[
                           new CircularPercentIndicator(
                             radius: 100.0,
                             lineWidth: 11.0,
                             animation: true,
-                            percent: verificarNumero(item.data['porcentaje']),
+                            percent: verificarNumero(item['porcentaje']),
                             center: new Text(
-                              formatearNumero(item.data['porcentaje'] * 100)
+                              me.formatearNumero(item['porcentaje'] * 100)
                                       .output
                                       .compactNonSymbol
                                       .toString() +
@@ -205,13 +225,13 @@ class _InversionesPageState extends State<InversionesPage> {
                               style: new TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 20.0),
                             ),
-                            header: Text(item.data['rubro'].toString(),
+                            header: Text(item['rubro'].toString(),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 )),
                             footer: new Text(
-                              formatearNumero(item.data['ejecucion'])
+                              me.formatearNumero(item['ejecucion'])
                                   .output
                                   .withoutFractionDigits
                                   .toString(),
@@ -224,7 +244,7 @@ class _InversionesPageState extends State<InversionesPage> {
                           SizedBox(height: 5),
                           Text(
                             me
-                                .formatearNumero(item.data['pia'])
+                                .formatearNumero(item['pia'])
                                 .output
                                 .withoutFractionDigits
                                 .toString(),
@@ -270,16 +290,17 @@ class _InversionesPageState extends State<InversionesPage> {
       spacing: 20.0, // gap between adjacent chips
       runSpacing: 8.0, // gap between lines
       children: [
-        StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance
-              .collection('Inversiones')
-              .where('red', isEqualTo: '3.1 Presupuesto de Inversiones')
-              .where('anno', isEqualTo: annoSeleccionado)
-              .snapshots(),
-          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
-            if (!data.hasData) {
-              return Text('Cargando Informacion');
-            }
+         FutureBuilder(
+                      future: datos,
+                      builder: (BuildContext context,
+                          AsyncSnapshot data) {
+                        if (!data.hasData) {
+                          return Center(child: new CircularProgressIndicator());
+                        }
+                        prueba3 = data.data.where((f)=>
+                        f['anno']==annoSeleccionado
+                        && f['red']=='3.1 Presupuesto de Inversiones').toList();
+                        prueba3.sort((a,b)=>a['rubro'].toString().compareTo(b['rubro'].toString()));
             return Column(
               children: <Widget>[
                 Text(
@@ -293,7 +314,7 @@ class _InversionesPageState extends State<InversionesPage> {
                         alignment: WrapAlignment.center,
                         spacing: 20.0, // gap between adjacent chips
                         runSpacing: 8.0,
-                        children: data.data.documents.map((item) {
+                        children: prueba3.map((item) {
                           return Column(
                             children: <Widget>[
                               GestureDetector(
@@ -304,10 +325,10 @@ class _InversionesPageState extends State<InversionesPage> {
                                       lineWidth: 9.0,
                                       animation: true,
                                       percent: verificarNumero(
-                                          item.data['porcentaje']),
+                                          item['porcentaje']),
                                       center: new Text(
-                                        formatearNumero(
-                                                    item.data['porcentaje'] *
+                                        me.formatearNumero(
+                                                    item['porcentaje'] *
                                                         100)
                                                 .output
                                                 .compactNonSymbol
@@ -318,13 +339,13 @@ class _InversionesPageState extends State<InversionesPage> {
                                             fontSize: 15.0),
                                       ),
                                       header:
-                                          Text(item.data['rubro'].toString(),
+                                          Text(item['rubro'].toString(),
                                               style: TextStyle(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.bold,
                                               )),
                                       footer: new Text(
-                                        formatearNumero(item.data['ejecucion'])
+                                        me.formatearNumero(item['ejecucion'])
                                             .output
                                             .withoutFractionDigits
                                             .toString(),
@@ -339,7 +360,7 @@ class _InversionesPageState extends State<InversionesPage> {
                                     SizedBox(height: 5),
                                     Text(
                                       me
-                                          .formatearNumero(item.data['pia'])
+                                          .formatearNumero(item['pia'])
                                           .output
                                           .withoutFractionDigits
                                           .toString(),
@@ -350,8 +371,8 @@ class _InversionesPageState extends State<InversionesPage> {
                                 ),
                                 onTap: () {
                                   setState(() {
-                                    rubro1 = item.data['rubro'];
-                                    if (item.data['rubro'] ==
+                                    rubro1 = item['rubro'];
+                                    if (item['rubro'] ==
                                         '3.1.1  Proyectos de Inversión') {
                                       rubro2 = 'Obras';
                                     } else {
@@ -382,25 +403,23 @@ class _InversionesPageState extends State<InversionesPage> {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 20),
-        StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance
-              .collection('Inversiones')
-              .where('red', isEqualTo: rubro1)
-              .where('anno', isEqualTo: annoSeleccionado)
-              .snapshots(),
-          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
-            if (!data.hasData) {
-              return Text('Cargando Informacion');
-            }
-            data.data.documents.sort((a, b) => a.data['rubro']
-                .toString()
-                .compareTo(b.data['rubro'].toString()));
+        FutureBuilder(
+                      future: datos,
+                      builder: (BuildContext context,
+                          AsyncSnapshot data) {
+                        if (!data.hasData) {
+                          return Center(child: new CircularProgressIndicator());
+                        }
+                        prueba4 = data.data.where((f)=>
+                        f['anno']==annoSeleccionado
+                        && f['red']==rubro1).toList();
+                        prueba4.sort((a,b)=>a['rubro'].toString().compareTo(b['rubro'].toString()));
             return Container(
                 child: Wrap(
                     alignment: WrapAlignment.center,
                     spacing: 20.0, // gap between adjacent chips
                     runSpacing: 8.0,
-                    children: data.data.documents.map((item) {
+                    children: prueba4.map((item) {
                       return Column(
                         children: <Widget>[
                           GestureDetector(
@@ -411,10 +430,10 @@ class _InversionesPageState extends State<InversionesPage> {
                                   lineWidth: 9.0,
                                   animation: true,
                                   percent:
-                                      verificarNumero(item.data['porcentaje']),
+                                      verificarNumero(item['porcentaje']),
                                   center: new Text(
-                                    formatearNumero(
-                                                item.data['porcentaje'] * 100)
+                                    me.formatearNumero(
+                                                item['porcentaje'] * 100)
                                             .output
                                             .compactNonSymbol
                                             .toString() +
@@ -423,13 +442,13 @@ class _InversionesPageState extends State<InversionesPage> {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15.0),
                                   ),
-                                  header: Text(item.data['rubro'].toString(),
+                                  header: Text(item['rubro'].toString(),
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                       )),
                                   footer: new Text(
-                                    formatearNumero(item.data['ejecucion'])
+                                    me.formatearNumero(item['ejecucion'])
                                         .output
                                         .withoutFractionDigits
                                         .toString(),
@@ -443,7 +462,7 @@ class _InversionesPageState extends State<InversionesPage> {
                                 SizedBox(height: 5),
                                 Text(
                                   me
-                                      .formatearNumero(item.data['pia'])
+                                      .formatearNumero(item['pia'])
                                       .output
                                       .withoutFractionDigits
                                       .toString(),
@@ -454,11 +473,11 @@ class _InversionesPageState extends State<InversionesPage> {
                             ),
                             onTap: () {
                               setState(() {
-                                rubro2 = item.data['rubro'];
+                                rubro2 = item['rubro'];
                               });
                             },
                             onDoubleTap: () {
-                              if (item.data['rubro'] == 'Obras') {
+                              if (item['rubro'] == 'Obras') {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute<Null>(
@@ -482,23 +501,24 @@ class _InversionesPageState extends State<InversionesPage> {
   Widget _buildetalledetalle(context) {
     return Column(
       children: <Widget>[
-        StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance
-              .collection('Inversiones')
-              .where('red', isEqualTo: rubro1)
-              .where('rubro', isEqualTo: rubro2)
-              .where('anno', isEqualTo: annoSeleccionado)
-              .snapshots(),
-          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
-            if (!data.hasData) {
-              return Center(child: new CircularProgressIndicator());
-            }
+         FutureBuilder(
+                      future: datos,
+                      builder: (BuildContext context,
+                          AsyncSnapshot data) {
+                        if (!data.hasData) {
+                          return Center(child: new CircularProgressIndicator());
+                        }
+                        prueba5 = data.data.where((f)=>
+                        f['anno']==annoSeleccionado
+                        && f['red']==rubro1
+                        && f['rubro']==rubro2).toList();
+                        prueba5.sort((a,b)=>a['rubro'].toString().compareTo(b['rubro'].toString()));
             return Wrap(
-              children: data.data.documents.map((item) {
+              children: prueba5.map((item) {
                 return Column(
                   children: <Widget>[
                     Center(
-                      child: Text(item.data['rubro'],
+                      child: Text(item['rubro'],
                           style: new TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 15.0)),
                     ),
@@ -513,7 +533,7 @@ class _InversionesPageState extends State<InversionesPage> {
                             DataRow(cells: [
                               DataCell(Text("Solicitud de Pedidos")),
                               DataCell(Text(me
-                                  .formatearNumero(item.data['solped'])
+                                  .formatearNumero(item['solped'])
                                   .output
                                   .withoutFractionDigits
                                   .toString())),
@@ -521,7 +541,7 @@ class _InversionesPageState extends State<InversionesPage> {
                             DataRow(cells: [
                               DataCell(Text("Pedidos")),
                               DataCell(Text(me
-                                  .formatearNumero(item.data['pedido'])
+                                  .formatearNumero(item['pedido'])
                                   .output
                                   .withoutFractionDigits
                                   .toString())),
@@ -529,7 +549,7 @@ class _InversionesPageState extends State<InversionesPage> {
                             DataRow(cells: [
                               DataCell(Text("Reservas")),
                               DataCell(Text(me
-                                  .formatearNumero(item.data['reserva'])
+                                  .formatearNumero(item['reserva'])
                                   .output
                                   .withoutFractionDigits
                                   .toString())),
@@ -543,7 +563,7 @@ class _InversionesPageState extends State<InversionesPage> {
                                 Text(
                                     me
                                         .formatearNumero(
-                                            item.data['comprometido'])
+                                            item['comprometido'])
                                         .output
                                         .withoutFractionDigits
                                         .toString(),
@@ -579,14 +599,16 @@ class MyWiget2 extends StatefulWidget {
 class _MyWiget2State extends State<MyWiget2> {
   Metodos me = Metodos();
   List<String> valores;
-  List<dynamic> resultado;
+  Future<List<dynamic>> resultado;
   String nomRed;
+   CloudService cloud = new CloudService();
   @override
   @override
   void initState() {
     super.initState();
     nomRed='LIMA';
     listar();
+    resultado = cloud.listarDatosPorColeccion('Obras');
   }
 
   Widget build(BuildContext context) {
@@ -603,31 +625,24 @@ class _MyWiget2State extends State<MyWiget2> {
             ))));
   }
 
-  Future<List<dynamic>> listar() async {
+
+   listar() async {
     List<String> aux = new List();
     valores = new List();
-    resultado = new List();
-    Firestore.instance
-        .collection('Obras')
-        .snapshots()
-        .listen((QuerySnapshot snapshot) {
-      snapshot.documents
-          .map((f) => {
-                f.data.values.map((d) {
-                  setState(() {
-                    aux.add(d['red']);
-                    valores = aux.toSet().toList();
-                    resultado.add(d);
-                  });
-                }).toList()
-              })
-          .toList();
-    });
-
-    return resultado;
+    resultado = cloud.listarDatosPorColeccion('Obras');
+    await new Future.delayed(new Duration(seconds: 1));
+    resultado.then((f)=>f.map((f){
+      setState(() {
+          aux.add(f['red']);
+      valores = aux.toSet().toList();
+      });
+     }).toList());
+        
+    await new Future.delayed(new Duration(seconds: 2));
+      
   }
 
-  Widget _builCombo(context) {
+    Widget _builCombo(context) {
     return Center(
         child: DropdownButton<String>(
             hint: Text("Seleccione Departamento"),
@@ -656,7 +671,7 @@ class _MyWiget2State extends State<MyWiget2> {
     List<dynamic> prueba = new List();
     return Center(
         child: FutureBuilder(
-            future: listar(),
+            future: resultado,
             builder: (BuildContext context, AsyncSnapshot data) {
               if (data.data == null) {
                 return Text("Sin datos");
@@ -697,7 +712,16 @@ class _MyWiget2State extends State<MyWiget2> {
                               ),
                               circularStrokeCap: CircularStrokeCap.round,
                               progressColor: Colors.lightGreen,
-                            )
+                            ),       SizedBox(height: 5),
+                                Text(
+                                  me
+                                      .formatearNumero(f['pia'])
+                                      .output
+                                      .withoutFractionDigits
+                                      .toString(),
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.grey),
+                                ),
                     
                     ],
                   );

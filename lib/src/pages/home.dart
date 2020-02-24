@@ -70,7 +70,7 @@ Future< List<ScreenHiddenDrawer>> iniciarSesion()async{
           baseStyle: TextStyle( color: Colors.white.withOpacity(0.8), fontSize: 16.0 ),
           colorLineSelected: Colors.teal,
         ),
-        RankingChart.withSampleData()));
+        RankingChart()));
         })
         .catchError((e){
         print(e);

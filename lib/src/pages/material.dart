@@ -1,7 +1,7 @@
-import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gcpp_essalud/src/services/firestore.dart';
 
 import 'package:gcpp_essalud/src/util/metodos.dart';
 import 'package:intl/intl.dart';
@@ -15,15 +15,20 @@ class MaterialEstrategico extends StatefulWidget {
 
 class _MaterialEstrategicoState extends State<MaterialEstrategico> {
   Metodos me = new Metodos();
-  String gerencia = 'TOTAL';
-  Random random = new Random();
+  String red = 'TOTAL';
   String rubro;
+  CloudService cloud = new CloudService();
   final f = new DateFormat('dd-MM-yyyy');
   final form = new DateFormat('dd/MM/yyyy');
   String annoSeleccionado='2020';
+  Future<List<dynamic>> datos;
+  List<dynamic> prueba = new List();
+  List<dynamic> prueba2 = new List();
+  List<dynamic> prueba3 = new List();
   @override
   void initState() { 
     super.initState();
+    listar();
     rubro='CENTRALIZADA';
   }
   @override
@@ -48,7 +53,7 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                                       padding: const EdgeInsets.fromLTRB(
                                           10, 0, 0, 0),
                                       child: DropdownButton(
-                                        value: gerencia,
+                                        value: red,
                                         hint: Text("Seleccione Red"),
                                         icon: Icon(Icons.arrow_drop_down),
                                         iconSize: 24,
@@ -57,7 +62,7 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                                             color: Colors.black, fontSize: 15),
                                         onChanged: (String ge) {
                                           setState(() {
-                                            gerencia = ge;
+                                            red = ge;
                                           });
                                         },
                                         items: me.redes
@@ -77,35 +82,33 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                             )),
                             Column(
                               children: <Widget>[
-                                                        StreamBuilder<QuerySnapshot>(
-                          stream: Firestore.instance
-                              .collection('Material')
-                              .where('red', isEqualTo: gerencia)
-                              .where('rubro', isEqualTo: 'SUB-TOTAL')
-                              .where('anno',isEqualTo: annoSeleccionado)
-                              .snapshots(),
+                      FutureBuilder(
+                          future: datos,
                           builder: (BuildContext context,
-                              AsyncSnapshot<QuerySnapshot> data) {
+                              AsyncSnapshot data) {
                             if (!data.hasData) {
                               return Center(
                                   child: new CircularProgressIndicator());
                             }
+                             prueba = data.data.where((f)=>f['red']==red 
+                        && f['anno']==annoSeleccionado
+                        && f['rubro']=='SUB-TOTAL').toList();
                             return GestureDetector(
                               child: Container(
                                   child: Column(
-                                children: data.data.documents.map((item){
+                                children: prueba.map((item){
                                   return Column(
                                     children: <Widget>[
-                                                                       new CircularPercentIndicator(
+                              new CircularPercentIndicator(
                                     radius: 130.0,
                                     lineWidth: 15.0,
                                     animation: true,
                                     percent: me.verificarNumero(
-                                       item.data['porcentaje']),
+                                       item['porcentaje']),
                                     center: new Text(
                                       me
                                               .formatearNumero(
-                                                  item.data
+                                                  item
                                                           ['porcentaje'] *
                                                       100)
                                               .output
@@ -117,7 +120,7 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                                           fontSize: 18.0),
                                     ),
                                     header: Text(
-                                     item.data['red'],
+                                     item['red'],
                                       style: new TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15.0,
@@ -126,7 +129,7 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                                     ),
                                     footer: new Text(
                                       me
-                                          .formatearNumero(item.data['ejecucion'])
+                                          .formatearNumero(item['ejecucion'])
                                           .output
                                           .withoutFractionDigits
                                           .toString(),
@@ -139,14 +142,14 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                                   ),
                                   SizedBox(height: 5),
                               Text(  me.formatearNumero(
-                                           item.data['pia'])
+                                           item['pia'])
                                       .output
                                       .withoutFractionDigits
                                       .toString(),style: TextStyle(fontSize: 17,
                                 color:Colors.grey
                               ),),
                                   SizedBox(height: 10),
-                              Text("al " + form.format(f.parse(item.data['fecha']).toLocal()),style: TextStyle(
+                              Text("al " + form.format(f.parse(item['fecha']).toLocal()),style: TextStyle(
                                 color:Colors.grey
                               ),)
                                     ],
@@ -168,6 +171,21 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                     )])))
               ])));
   }
+
+  listar()  {
+   cloud.listarDatos('PruebaMateriales').listen((QuerySnapshot snapshot) {
+            List<dynamic> aux = new List();
+            snapshot.documents.map((f){
+              f.data.values.map((d){
+               aux.add(d);    
+                }).toList();
+                setState(() {
+                datos = cloud.convertir(aux); 
+              });
+              }).toList();
+              
+    });
+}
   Widget _builCombo(context) {
     var anno = ['2019','2020'];
     return  
@@ -196,27 +214,23 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
   Widget detalleRedes(context) {
     return Wrap(
       children: <Widget>[
-        StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance
-              .collection('Material')
-              .where('red', isEqualTo: gerencia)
-              .where('rubro',
-                  whereIn: ['CENTRALIZADA', 'DELEGADA', 'LOCAL'])
-                  .where('anno',isEqualTo: annoSeleccionado).snapshots(),
-          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
+        FutureBuilder(
+          future: datos,
+          builder: (BuildContext context, AsyncSnapshot data) {
             if (!data.hasData) {
               return Center(child: new CircularProgressIndicator());
             }
 
-            data.data.documents.sort((a, b) => a.data['rubro']
-                .toString()
-                .compareTo(b.data['rubro'].toString()));
+             prueba2 =data.data.where((f)=>f['red']==red 
+                        && f['anno']==annoSeleccionado
+                        && f['rubro']!='SUB-TOTAL').toList();
+            prueba2.sort((a,b)=>a['rubro'].toString().compareTo(b['rubro'].toString()));
             return Column(children: <Widget>[
               Wrap(
                   alignment: WrapAlignment.center,
                   spacing: 20.0, // gap between adjacent chips
                   runSpacing: 8.0,
-                  children: data.data.documents.map((item) {
+                  children: prueba2.map((item) {
                     return new Wrap(children: <Widget>[
                       GestureDetector(
                         child: 
@@ -226,11 +240,11 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                           radius: 90.0,
                           lineWidth: 10.0,
                           animation: true,
-                          percent: me.verificarNumero(item.data['porcentaje']),
+                          percent: me.verificarNumero(item['porcentaje']),
                           center: new Text(
                             me
                                     .formatearNumero(
-                                        item.data['porcentaje'] * 100)
+                                        item['porcentaje'] * 100)
                                     .output
                                     .nonSymbol
                                     .toString() +
@@ -240,7 +254,7 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                           ),
                           header: Text(
                             me.mayuscula(
-                                item.data['rubro'].toString().toLowerCase()),
+                                item['rubro'].toString().toLowerCase()),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -248,7 +262,7 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                           ),
                           footer: new Text(
                             me
-                                .formatearNumero(item.data['ejecucion'])
+                                .formatearNumero(item['ejecucion'])
                                 .output
                                 .withoutFractionDigits
                                 .toString(),
@@ -260,7 +274,7 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                         ),
                             SizedBox(height: 5),
                               Text(  me.formatearNumero(
-                                           item.data['pia'])
+                                           item['pia'])
                                       .output
                                       .withoutFractionDigits
                                       .toString(),style: TextStyle(fontSize: 14,
@@ -271,7 +285,7 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
 ,
                         onTap: () {
                           setState(() {
-                            rubro = item.data['rubro'];
+                            rubro = item['rubro'];
                           });
                         },
                       )
@@ -287,23 +301,21 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
   detalleRedesCompromisos(context) {
     return Column(
       children: <Widget>[
-        StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance
-              .collection('Material')
-              .where('red', isEqualTo: gerencia)
-              .where('rubro', isEqualTo: rubro)
-              .where('anno',isEqualTo: annoSeleccionado)
-              .snapshots(),
-          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
+        FutureBuilder(
+          future: datos,
+          builder: (BuildContext context, AsyncSnapshot data) {
             if (!data.hasData) {
               return Center(child: new CircularProgressIndicator());
             }
+              prueba3 =data.data.where((f)=>f['red']==red 
+                        && f['anno']==annoSeleccionado
+                        && f['rubro']==rubro).toList();
             return Wrap(
-              children: data.data.documents.map((item){
+              children: prueba3.map((item){
                   return Column(
                     children: <Widget>[
                 Center(
-                  child: Text(item.data['rubro'],
+                  child: Text(item['rubro'],
                       style: new TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 15.0)),
                 ),
@@ -318,7 +330,7 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                         DataRow(cells: [
                           DataCell(Text("Solicitud de Pedidos")),
                           DataCell(Text(me
-                              .formatearNumero(item.data['solped'])
+                              .formatearNumero(item['solped'])
                               .output
                               .withoutFractionDigits
                               .toString())),
@@ -326,7 +338,7 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                         DataRow(cells: [
                           DataCell(Text("Pedidos")),
                           DataCell(Text(me
-                              .formatearNumero(item.data['pedido'])
+                              .formatearNumero(item['pedido'])
                               .output
                               .withoutFractionDigits
                               .toString())),
@@ -335,7 +347,7 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                           DataCell(Text("Reservas")),
                           DataCell(Text(me
                               .formatearNumero(
-                                 item.data['reserva'])
+                                 item['reserva'])
                               .output
                               .withoutFractionDigits
                               .toString())),
@@ -349,7 +361,7 @@ class _MaterialEstrategicoState extends State<MaterialEstrategico> {
                             Text(
                                 me
                                     .formatearNumero(
-                                        item.data['comprometido'])
+                                        item['comprometido'])
                                     .output
                                     .withoutFractionDigits
                                     .toString(),

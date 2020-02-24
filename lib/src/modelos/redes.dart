@@ -1,5 +1,3 @@
-
-
 class Redes{
   String nomRed;
   double latitude;

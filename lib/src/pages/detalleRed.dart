@@ -1,7 +1,9 @@
+
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/services/firestore.dart';
-
 import 'package:gcpp_essalud/src/util/metodos.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -28,16 +30,18 @@ class _DetalleRedState extends State<DetalleRed> {
   String annoSeleccionado='2020';
   String rubro='BIENES';
   Metodos me = new Metodos();
-  CloudService cloud = new CloudService();
+  static CloudService cloud = new CloudService();
   List<dynamic> prueba = new List();
+  List<dynamic> prueba2 = new List();
+  List<dynamic> prueba3 = new List();
+  Future<List<dynamic>>  datos ;
   @override
   Widget build(BuildContext context) {
     String red = widget.red;
-    listarDatos('PruebaRedes','ALMENARA');
+    listar();
     return Center(
       child: Column(
         children: <Widget>[
-          
            SizedBox(height: 20),
           _builCombo(context),
           Center(
@@ -49,12 +53,14 @@ class _DetalleRedState extends State<DetalleRed> {
             ),
           ),
           FutureBuilder(
-            future: listarDatos('PruebaRedes', red),
+            future: datos,
             builder: (BuildContext context, AsyncSnapshot data) {
               if (!data.hasData) {
                 return Center(child: new CircularProgressIndicator());
               }
-              prueba = data.data.where((f)=>f['red']==red && f['anno']==annoSeleccionado && f['rubro']=='SUB-TOTAL').toList();
+              prueba = data.data.where((f)=>f['red']==red 
+                        && f['anno']==annoSeleccionado
+                        && f['rubro']=='SUB-TOTAL').toList();
               return GestureDetector(
                 child: Container(
                     child: Column(
@@ -65,26 +71,12 @@ class _DetalleRedState extends State<DetalleRed> {
                       radius: 130.0,
                       lineWidth: 15.0,
                       animation: true,
-                      percent: me.verificarNumero(
-                          item['porcentaje']),
-                      center: new Text(
-                        me
-                                .formatearNumero(
-                                    item['porcentaje'] * 100)
-                                .output
-                                .nonSymbol
-                                .toString() +
-                            '%',
+                      percent:  me.verificarNumero2(item['porcentaje']),
+                      center: new Text(me.formatearNumero(item['porcentaje'] * 100).output.compactNonSymbol.toString()+'%',
                         style: new TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 18.0),
                       ),
-                      footer: new Text(
-                        me
-                            .formatearNumero(
-                                item['ejecucion'])
-                            .output
-                            .withoutFractionDigits
-                            .toString(),
+                      footer: new Text(me.formatearNumero(item['ejecucion']).output.withoutFractionDigits.toString(),
                         style: new TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 15.0),
                       ),
@@ -92,11 +84,8 @@ class _DetalleRedState extends State<DetalleRed> {
                       progressColor: Colors.green,
                     ),
                     SizedBox(height: 5),
-                              Text(  me.formatearNumero(
-                                           item['pia'])
-                                      .output
-                                      .withoutFractionDigits
-                                      .toString(),style: TextStyle(fontSize: 17,
+                              Text(  me.formatearNumero(item['pia']).output.withoutFractionDigits.toString(),
+                              style: TextStyle(fontSize: 17,
                                 color:Colors.grey
                               ),),
                     SizedBox(height: 10),
@@ -112,13 +101,28 @@ class _DetalleRedState extends State<DetalleRed> {
             },
           ),
           SizedBox(height: 20),
-          detalleRedes(context, red),
+         detalleRedes(context, red),
           SizedBox(height: 20),
           detalleRedesCompromisos(red,context)
         ],
       ),
     );
   }
+
+  listar() async {
+   cloud.listarDatos('PruebaRedes').listen((QuerySnapshot snapshot) {
+             List<dynamic> aux = new List();
+            snapshot.documents.map((f){
+              f.data.values.map((d){
+               aux.add(d);    
+                }).toList();
+                setState(() {
+                datos = cloud.convertir(aux); 
+              });
+              }).toList();
+              
+    });
+}
   Widget _builCombo(context) {
     var anno = ['2019', '2020'];
     return  
@@ -147,24 +151,22 @@ class _DetalleRedState extends State<DetalleRed> {
   Widget detalleRedes(context, String red) {
     return Wrap(
       children: <Widget>[
-        StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance
-              .collection('Redes')
-              .where('red', isEqualTo: red)
-              .where('rubro',
-                  whereIn: ['PERSONAL', 'BIENES', 'SERVICIOS'])
-                   .where('anno',isEqualTo: annoSeleccionado).snapshots(),
-          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
+        FutureBuilder(
+          future: datos,
+          builder: (BuildContext context, AsyncSnapshot data) {
             if (!data.hasData) {
               return Center(child: new CircularProgressIndicator());
             }
-            data.data.documents.sort((a,b)=>a.data['rubro'].toString().compareTo(b.data['rubro'].toString()));
+            prueba2 =data.data.where((f)=>f['red']==red 
+                        && f['anno']==annoSeleccionado
+                        && f['rubro']!='SUB-TOTAL').toList();
+            prueba2.sort((a,b)=>a['rubro'].toString().compareTo(b['rubro'].toString()));
             return Column(children: <Widget>[
               Wrap(
                   alignment: WrapAlignment.center,
                   spacing: 20.0, // gap between adjacent chips
                   runSpacing: 8.0,
-                  children: data.data.documents.map((item) {
+                  children: prueba2.map((item) {
                         
                     return new Wrap(children: <Widget>[
                       GestureDetector(
@@ -174,11 +176,11 @@ class _DetalleRedState extends State<DetalleRed> {
                           radius: 90.0,
                           lineWidth: 10.0,
                           animation: true,
-                          percent: me.verificarNumero(item.data['porcentaje']),
+                          percent: me.verificarNumero(item['porcentaje']),
                           center: new Text(
                             me
                                     .formatearNumero(
-                                        item.data['porcentaje'] * 100)
+                                        item['porcentaje'] * 100)
                                     .output
                                     .nonSymbol
                                     .toString() +
@@ -188,7 +190,7 @@ class _DetalleRedState extends State<DetalleRed> {
                           ),
                           header: Text(
                             me.mayuscula(
-                                item.data['rubro'].toString().toLowerCase()),
+                                item['rubro'].toString().toLowerCase()),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -196,7 +198,7 @@ class _DetalleRedState extends State<DetalleRed> {
                           ),
                           footer: new Text(
                             me
-                                .formatearNumero(item.data['ejecucion'])
+                                .formatearNumero(item['ejecucion'])
                                 .output
                                 .withoutFractionDigits
                                 .toString(),
@@ -207,7 +209,7 @@ class _DetalleRedState extends State<DetalleRed> {
                           progressColor: Colors.blue,
                         ),   SizedBox(height: 5),
                               Text(  me.formatearNumero(
-                                           item.data['pia'])
+                                           item['pia'])
                                       .output
                                       .withoutFractionDigits
                                       .toString(),style: TextStyle(fontSize: 14,
@@ -217,7 +219,7 @@ class _DetalleRedState extends State<DetalleRed> {
                         ),
                         onTap: () {
                           setState(() {
-                              rubro=item.data['rubro'];
+                              rubro=item['rubro'];
                           });
                         },
                       )
@@ -235,23 +237,21 @@ class _DetalleRedState extends State<DetalleRed> {
             return 
             Column(
               children: <Widget>[
-                StreamBuilder<QuerySnapshot>(
-            stream: Firestore.instance
-                .collection('Redes')
-                .where('red', isEqualTo: red)
-                .where('rubro', isEqualTo: rubro)
-                 .where('anno',isEqualTo: annoSeleccionado)
-                .snapshots(),
-            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
+                FutureBuilder(
+            future: datos,
+            builder: (BuildContext context, AsyncSnapshot data) {
               if (!data.hasData) {
                 return Center(child: new CircularProgressIndicator());
               }
+      prueba3 =data.data.where((f)=>f['red']==red 
+                        && f['anno']==annoSeleccionado
+                        && f['rubro']==rubro).toList();
       return Wrap(
-            children: data.data.documents.map((item){
+            children: prueba3.map<Widget>((item){
                 return Column(
                   children: <Widget>[
               Center(
-                child:  Text(item.data['rubro'],
+                child:  Text(item['rubro'],
                             style: new TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 15.0)
                                 ),
@@ -267,7 +267,7 @@ class _DetalleRedState extends State<DetalleRed> {
                       DataRow(cells: [
                         DataCell(Text("Solicitud de Pedidos")),
                         DataCell(Text(me
-                            .formatearNumero(item.data['solped'])
+                            .formatearNumero(item['solped'])
                             .output
                             .withoutFractionDigits
                             .toString())),
@@ -275,7 +275,7 @@ class _DetalleRedState extends State<DetalleRed> {
                       DataRow(cells: [
                         DataCell(Text("Pedidos")),
                         DataCell(Text(me
-                            .formatearNumero(item.data['pedido'])
+                            .formatearNumero(item['pedido'])
                             .output
                             .withoutFractionDigits
                             .toString())),
@@ -283,7 +283,7 @@ class _DetalleRedState extends State<DetalleRed> {
                       DataRow(cells: [
                         DataCell(Text("Reservas")),
                         DataCell(Text(me
-                            .formatearNumero(item.data['reserva'])
+                            .formatearNumero(item['reserva'])
                             .output
                             .withoutFractionDigits
                             .toString())),
@@ -296,7 +296,7 @@ class _DetalleRedState extends State<DetalleRed> {
                           Text(
                               me
                                   .formatearNumero(
-                                      item.data['comprometido'])
+                                      item['comprometido'])
                                   .output
                                   .withoutFractionDigits
                                   .toString(),
@@ -322,23 +322,7 @@ class _DetalleRedState extends State<DetalleRed> {
             );
           }
 
-  Future<List<dynamic>> listarDatos(String coleccion,String variable) async
-  {
-      List<dynamic> aux = new List();
-    cloud.listarDatos(coleccion)
-        .listen((QuerySnapshot snapshot) {
-            snapshot.documents.map((f){
-              f.data.values.map((d){
-               aux.add(d);     
-                }).toList();
-              }).toList();
-      
-        
 
-    });
-
-    return aux;
-  }
 
 
 }

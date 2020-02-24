@@ -1,25 +1,45 @@
+import 'dart:async';
+
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gcpp_essalud/src/services/firestore.dart';
 import 'package:gcpp_essalud/src/util/metodos.dart';
+import 'package:intl/intl.dart';
 
-class RankingChart extends StatelessWidget {
-  final List<charts.Series> seriesList;
-  final List<charts.Series> seriesList2;
-  final bool animate;
- 
-  RankingChart(this.seriesList,this.seriesList2, {this.animate});
+class RankingChart extends StatefulWidget {
 
-  /// Creates a [BarChart] with sample data and no transition.
-  factory RankingChart.withSampleData() {
-    return new RankingChart(
-      _createSampleData(),
-      _createSampleData2(),
-      // Disable animations for image tests.
-      animate: false,
-    );
+    @override
+  _RankingChartState createState() => _RankingChartState();
+}
+
+class _RankingChartState extends State<RankingChart> {
+  final f = new DateFormat('dd-MM-yyyy');
+  final form = new DateFormat('dd/MM/yyyy');
+  String fecha;
+  List<charts.Series<OrdinalSales, String>> _seriesDataRedes; 
+  List<charts.Series<OrdinalSales, String>> _seriesDataSede; 
+  StreamSubscription<QuerySnapshot> noteSub;
+  Future<List<dynamic>> datos;
+  Future<List<dynamic>> datosSede;
+  Future<String> fech;
+  List<OrdinalSales> prueba;
+  List<OrdinalSales> prueba2;
+  String annoSeleccionado;
+  CloudService cloud = new CloudService();
+     Metodos me = new Metodos();
+  @override
+  void initState() {
+    super.initState();
+    annoSeleccionado ='2020';
+       listar();
+    
   }
-
+   @override
+  void dispose() {
+    noteSub?.cancel();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     
@@ -33,116 +53,186 @@ class RankingChart extends StatelessWidget {
                     child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
+                     SizedBox(height: 10),
+                     _builCombo(context),
+                     SizedBox(height: 10),
                     Text("Raking de Redes Asistenciales",
                      style: new TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20.0)),
                                        SizedBox(height: 5),
-                                    Text("al 17/02/2020",
+                                         FutureBuilder(
+                    future: fech,
+                    builder: (BuildContext context, AsyncSnapshot data) {
+                      if (!data.hasData) {
+                        return Text('Cargando Informacion');
+                      }
+                       return       Text(form.format(
+                                      f.parse(data.data).toLocal()),
                      style: new TextStyle(color: Colors.grey,
-                                    fontSize: 15.0)),
+                                    fontSize: 15.0));
+                    },
+                  ),
                     Expanded(
                       child: Container(
                         child: 
                         Padding( 
                           padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                        child:new charts.BarChart(
-                      seriesList,
-                      animate: animate,
+                        child:
+                       
+                    FutureBuilder(
+                    future: datos,
+                    builder: (BuildContext context, AsyncSnapshot data) {
+                      if (!data.hasData) {
+                        return Text('Cargando Informacion');
+                      }
+                       _seriesDataRedes = List<charts.Series<OrdinalSales, String>>();
+                      prueba = data.data
+                          .where((f) =>f.anno == annoSeleccionado)
+                          .toList();
+                             _seriesDataRedes.add(
+                            charts.Series<OrdinalSales, String>(
+                             id: 'Sales',
+                            domainFn: (OrdinalSales sales, _) => sales.year,
+                           measureFn: (OrdinalSales sales, _) => sales.sales,
+                            colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+                           data: prueba,
+                           labelAccessorFn: (OrdinalSales sales, _) =>'${sales.sales.toString()}%'));
+                      return charts.BarChart(
+                      _seriesDataRedes,
                       vertical: false,
-                      
+                      animate: true,
+                      animationDuration: Duration(seconds: 3),
                        barRendererDecorator: new charts.BarLabelDecorator<String>(),
 
-                    )))),
-                                        Text("Raking de Sede Central",
+                    );
+                    },
+                  )
+                    ))),
+                    Text("Raking de Sede Central",
                      style: new TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20.0)),
                                        SizedBox(height: 5),
-                                    Text("al 17/02/2020",
+                                         FutureBuilder(
+                    future: fech,
+                    builder: (BuildContext context, AsyncSnapshot data) {
+                      if (!data.hasData) {
+                        return Text('Cargando Informacion');
+                      }
+                       return       Text(form.format(
+                                      f.parse(data.data).toLocal()),
                      style: new TextStyle(color: Colors.grey,
-                                    fontSize: 15.0)),
+                                    fontSize: 15.0));
+                    },
+                  ),
                     Expanded(
                       child: Container(
                         child: 
                         Padding( 
                           padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                        child:new charts.BarChart(
-                      seriesList2,
-                      animate: animate,
+                        child:
+                       
+                    FutureBuilder(
+                    future: datosSede,
+                    builder: (BuildContext context, AsyncSnapshot data) {
+                      if (!data.hasData) {
+                        return Text('Cargando Informacion');
+                      }
+                       _seriesDataSede = List<charts.Series<OrdinalSales, String>>();
+                      prueba2 = data.data
+                          .where((f) =>f.anno == annoSeleccionado)
+                          .toList();
+                             _seriesDataSede.add(
+                            charts.Series<OrdinalSales, String>(
+                             id: 'Sales',
+                            domainFn: (OrdinalSales sales, _) => sales.year,
+                           measureFn: (OrdinalSales sales, _) => sales.sales,
+                            colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+                           data: prueba2,
+                           labelAccessorFn: (OrdinalSales sales, _) =>'${sales.sales.toString()}%'));
+                      return charts.BarChart(
+                      _seriesDataSede,
                       vertical: false,
-                      
+                      animate: true,
+                      animationDuration: Duration(seconds: 3),
                        barRendererDecorator: new charts.BarLabelDecorator<String>(),
 
-                    ))))
+                    );
+                    },
+                  )
+                    ))),
                   ],
                 ))));}));
   }
-
-  /// Create one series with sample hard coded data.
-  static List<charts.Series<OrdinalSales, String>> _createSampleData() {
-   Metodos me = new Metodos();
+listar() async{
+  
+    noteSub?.cancel();
+   noteSub= cloud.listarDatos('RankingRedes').listen((QuerySnapshot snapshot) {
    List<OrdinalSales> valores = new List();
-     Firestore.instance
-        .collection('RankingRedes')
-        .snapshots()
-        .listen((QuerySnapshot snapshot) {
-      snapshot.documents
-          .map((f) => {f.data.values.map((d) {
-          valores.add(new OrdinalSales(d['red'], double.parse(me.formatearNumero(d['porcentaje'] * 100).output.compactNonSymbol)));
-           valores.sort((a, b) => b.sales.compareTo(a.sales));
-          }).toList()})
-          .toList();
+            snapshot.documents.map((f){
+              f.data.values.map((d){
+               valores.add(new OrdinalSales(d['red'],double.parse(me.formatearNumero(d['porcentaje'] * 100).output.compactNonSymbol),d['anno']));
+               valores.sort((a, b) => b.sales.compareTo(a.sales));
+               fecha=d['fecha'];  
+                }).toList();
+                setState(() {
+                datos = cloud.convertir(valores); 
+                fech = cloud.convertirFecha(fecha);
+              });
+              }).toList();
+              
     });
-    
-    return [
-      new charts.Series<OrdinalSales, String>(
-        id: 'Sales',
-        domainFn: (OrdinalSales sales, _) => sales.year,
-        measureFn: (OrdinalSales sales, _) => sales.sales,
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
 
-        data: valores,
-        labelAccessorFn: (OrdinalSales sales, _) =>
-              '${sales.sales.toString()}%')
-      
-    ];
-  }
-    static List<charts.Series<OrdinalSales, String>> _createSampleData2() {
-   Metodos me = new Metodos();
+noteSub= cloud.listarDatos('RankingSede').listen((QuerySnapshot snapshot) {
    List<OrdinalSales> valores = new List();
-     Firestore.instance
-        .collection('RankingSede')
-        .snapshots()
-        .listen((QuerySnapshot snapshot) {
-      snapshot.documents
-          .map((f) => {f.data.values.map((d) {
-          valores.add(new OrdinalSales(d['siglas'], double.parse(me.formatearNumero(d['porcentaje'] * 100).output.compactNonSymbol)));
-           valores.sort((a, b) => b.sales.compareTo(a.sales));
-          }).toList()})
-          .toList();
+            snapshot.documents.map((f){
+              f.data.values.map((d){
+               valores.add(new OrdinalSales(d['siglas'],double.parse(me.formatearNumero(d['porcentaje'] * 100).output.compactNonSymbol),d['anno']));
+               valores.sort((a, b) => b.sales.compareTo(a.sales));
+               fecha=d['fecha'];  
+                }).toList();
+                setState(() {
+                datosSede = cloud.convertir(valores); 
+              });
+              }).toList();
+              
     });
-    
-    return [
-      new charts.Series<OrdinalSales, String>(
-        id: 'Sales',
-        domainFn: (OrdinalSales sales, _) => sales.year,
-        measureFn: (OrdinalSales sales, _) => sales.sales,
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-
-        data: valores,
-        labelAccessorFn: (OrdinalSales sales, _) =>
-              '${sales.sales.toString()}%')
-      
-    ];
-  }
 
 }
+ Widget _builCombo(context) {
+    var anno = ['2019', '2020'];
+    return  
+    Center(child:DropdownButton(
+            hint: Text("Seleccione Año"),
+            value: annoSeleccionado,
+            icon: Icon(Icons.arrow_drop_down),
+            iconSize: 24,
+            elevation: 16,
+            style: TextStyle(color: Colors.black, fontSize: 15),
+            onChanged: (String ge) {
+              setState(() {
+                annoSeleccionado=ge;
+              });
+            },
+            items: anno.map((String valor) {
+              return DropdownMenuItem<String>(
+                value: valor,
+                child: Text(
+                  valor,
+                  style: TextStyle(color: Colors.black, fontSize: 12),
+                ),
+              );
+            }).toList()));
+  }
+  }
+
 
 /// Sample ordinal data type.
 class OrdinalSales {
   final String year;
   final double sales;
+  final String anno;
 
-  OrdinalSales(this.year, this.sales);
+  OrdinalSales(this.year, this.sales,this.anno);
 }
