@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gcpp_essalud/src/modelos/redes.dart';
 import 'package:gcpp_essalud/src/util/metodos.dart';
 import 'package:gcpp_essalud/src/pages/detalleRed.dart';
@@ -42,16 +41,7 @@ class _SecondPageState extends State<SecondPage> {
 
  
 
-  void showToast(message) {
-    Fluttertoast.showToast(
-        msg: message,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIos: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 16.0);
-  }
+
 
   @override
   void initState() {
