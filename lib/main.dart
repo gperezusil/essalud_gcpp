@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/pages/home.dart';
 import 'package:gcpp_essalud/src/preferencias_usuario/preferencias_usuario.dart';
+import 'package:gcpp_essalud/src/screen/changePass.dart';
 import 'package:gcpp_essalud/src/screen/login.dart';
+
+import 'src/screen/login.dart';
  
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +24,6 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       title: 'Ejecucion Presupuestal',
-      home: prefs.token!=''?HomePage():LoginPage()
-    );
+      home: prefs.token!=''?ChangePassword():LoginPage());
   }
 }

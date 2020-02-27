@@ -1,36 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
 import 'package:gcpp_essalud/src/preferencias_usuario/preferencias_usuario.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+
 
 class LoginProvider {
-  final String _firebaseToken = 'AIzaSyCfqKEmVZG_CdY5sSBwt9xXV2IIAz8wXrQ';
   final _prefs = new PreferenciasUsuario();
-
-  Future<Map<String, dynamic>> login(String email, String password) async {
-    final authData = {
-      'email': email,
-      'password': password,
-      'returnSecureToken': true
-    };
-
-    final resp = await http.post(
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=$_firebaseToken',
-        body: json.encode(authData));
-
-    Map<String, dynamic> decodedResp = json.decode(resp.body);
-
-    if (decodedResp.containsKey('idToken')) {
-      _prefs.token = decodedResp['idToken'];
-      _prefs.email = decodedResp['email'];
-      _prefs.nombre = decodedResp['displayName'];
-
-      return {'ok': true, 'token': decodedResp['idToken']};
-    } else {
-      return {'ok': false, 'mensaje': decodedResp['error']['message']};
-    }
-  }
+  final bool estado=false;
 
   Future<Map<String, dynamic>> login2(String email, String pass) async {
     Map<String, dynamic> decodedResp;
@@ -59,7 +34,26 @@ class LoginProvider {
     }
   }
 
+  Future<void> cambiarContrasena(String pass) async{
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    //Pass in the password to updatePassword.
+    user.updatePassword(pass).then((_){
+      Firestore.instance.collection('Usuarios').document(user.uid).updateData({'emailVerified':true});
+    }).catchError((error){
+      //This might happen, when the wrong password is in, the user isn't found, or if the user hasn't logged in recently.
+    });
+  }
+
   Future<void> cerrarSesion()async {
     return await FirebaseAuth.instance.signOut();
+  }
+
+  Future<bool> obtenerEstado()async {
+    bool estado=false;
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+     await Firestore.instance.collection('Usuarios').document(user.uid).get().then((onValue){
+           estado=  onValue.data['emailVerified'] as bool; 
+     });
+     return estado;
   }
 }

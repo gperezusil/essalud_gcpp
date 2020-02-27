@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:gcpp_essalud/src/modelos/login_provider.dart';
-import 'package:gcpp_essalud/src/pages/home.dart';
+import 'package:gcpp_essalud/src/screen/changePass.dart';
 
 
 class LoginPage extends StatelessWidget {
@@ -16,8 +16,9 @@ class LoginPage extends StatelessWidget {
       onSignup: _authUser,
       onSubmitAnimationCompleted: () {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => HomePage(),
+          builder: (context) => ChangePassword(),
         ));
+        usuarioProvider.obtenerEstado();
       },
       messages: LoginMessages(
           usernameHint: 'Correo',
@@ -25,6 +26,7 @@ class LoginPage extends StatelessWidget {
           loginButton: 'Ingresar',
           signupButton: 'Registrar',
           forgotPasswordButton: '¿Olvidaste la Contraseña ?'),
+          
       //onRecoverPassword: _recoverPassword,
       theme: LoginTheme(
         titleStyle: TextStyle(
