@@ -12,7 +12,7 @@ class CloudService{
   CloudService.internal();
 
  
-     Stream<QuerySnapshot> listarDatos(String colec,{int offset, int limit}) {
+    Stream<QuerySnapshot> listarDatos(String colec,{int offset, int limit}) {
     CollectionReference coleccion = Firestore.instance.collection(colec);
     Stream<QuerySnapshot> snapshots = coleccion.snapshots();
  

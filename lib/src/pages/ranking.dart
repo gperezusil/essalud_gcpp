@@ -170,6 +170,7 @@ listar() async{
     noteSub?.cancel();
    noteSub= cloud.listarDatos('RankingRedes').listen((QuerySnapshot snapshot) {
    List<OrdinalSales> valores = new List();
+   
             snapshot.documents.map((f){
               f.data.values.map((d){
                valores.add(new OrdinalSales(d['red'],double.parse(me.formatearNumero(d['porcentaje'] * 100).output.compactNonSymbol),d['anno']));

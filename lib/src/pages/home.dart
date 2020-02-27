@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gcpp_essalud/src/pages/configuracion.dart';
 import 'package:gcpp_essalud/src/pages/first.dart';
 import 'package:gcpp_essalud/src/pages/inversiones.dart';
 import 'package:gcpp_essalud/src/pages/material.dart';
@@ -23,8 +24,7 @@ class _HomeState extends State<HomePage>{
 
 Future< List<ScreenHiddenDrawer>> iniciarSesion()async{
    items = new List();
- await FirebaseAuth.instance.signInAnonymously()
-        .then((AuthResult user){
+
         items.add(new ScreenHiddenDrawer(
         new ItemHiddenMenu(
           name: 'Institucional',
@@ -71,10 +71,14 @@ Future< List<ScreenHiddenDrawer>> iniciarSesion()async{
           colorLineSelected: Colors.teal,
         ),
         RankingChart()));
-        })
-        .catchError((e){
-        print(e);
-      });
+               items.add(new ScreenHiddenDrawer(
+        new ItemHiddenMenu(
+          name: 'Configuracion',
+          baseStyle: TextStyle( color: Colors.white.withOpacity(0.8), fontSize: 16.0 ),
+          colorLineSelected: Colors.teal,
+        ),
+        Configuracion()));
+      
 
       return items;
 }

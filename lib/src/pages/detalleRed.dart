@@ -11,7 +11,6 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 class DetalleRed extends StatefulWidget {
   final String red;
   const DetalleRed({Key key, this.red}) : super(key: key);
-
   static Route<dynamic> route(red) {
     
     return MaterialPageRoute(
@@ -24,6 +23,7 @@ class DetalleRed extends StatefulWidget {
 
 }
 
+
 class _DetalleRedState extends State<DetalleRed> {
   final f = new DateFormat('dd-MM-yyyy');
   final form = new DateFormat('dd/MM/yyyy');
@@ -35,10 +35,15 @@ class _DetalleRedState extends State<DetalleRed> {
   List<dynamic> prueba2 = new List();
   List<dynamic> prueba3 = new List();
   Future<List<dynamic>>  datos ;
+  
+  @override
+  void initState() { 
+    super.initState();
+    listar();
+  }
   @override
   Widget build(BuildContext context) {
     String red = widget.red;
-    listar();
     return Center(
       child: Column(
         children: <Widget>[
@@ -112,6 +117,7 @@ class _DetalleRedState extends State<DetalleRed> {
   listar() async {
    cloud.listarDatos('PruebaRedes').listen((QuerySnapshot snapshot) {
              List<dynamic> aux = new List();
+            
             snapshot.documents.map((f){
               f.data.values.map((d){
                aux.add(d);    

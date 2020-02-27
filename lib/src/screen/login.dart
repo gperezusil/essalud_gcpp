@@ -37,7 +37,7 @@ class LoginPage extends StatelessWidget {
   }
 
   Future<String> _authUser(LoginData data) async {
-    Map info = await usuarioProvider.login(data.name, data.password); 
+    Map info = await usuarioProvider.login2(data.name, data.password); 
     
       if (info['ok']) {
         return null;
@@ -46,6 +46,8 @@ class LoginPage extends StatelessWidget {
       }
     
   }
+
+
 
 
 }

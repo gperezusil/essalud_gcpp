@@ -76,6 +76,7 @@ listar() async{
   
     noteSub?.cancel();
    noteSub= cloud.listarDatos('PruebaInstitucional').listen((QuerySnapshot snapshot) {
+     
    List<dynamic> aux = new List();
             snapshot.documents.map((f){
               f.data.values.map((d){

@@ -156,6 +156,7 @@ class _SedeCentralState extends State<SedeCentral> {
     listar() async {
    cloud.listarDatos('PruebaSede').listen((QuerySnapshot snapshot) {
              List<dynamic> aux = new List();
+            
             snapshot.documents.map((f){
               f.data.values.map((d){
                aux.add(d);    

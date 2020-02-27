@@ -6,7 +6,6 @@ import 'package:gcpp_essalud/src/services/firestore.dart';
 import 'package:gcpp_essalud/src/util/metodos.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 
 class InversionesPage extends StatefulWidget {
   @override
@@ -68,6 +67,7 @@ class _InversionesPageState extends State<InversionesPage> {
    listar() async {
    cloud.listarDatos('PruebaInversiones').listen((QuerySnapshot snapshot) {
              List<dynamic> aux = new List();
+           
             snapshot.documents.map((f){
               f.data.values.map((d){
                aux.add(d);    
