@@ -1,4 +1,4 @@
-package com.example.gcpp_essalud
+package com.essalud.gcpp_essalud
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

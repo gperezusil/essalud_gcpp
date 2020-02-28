@@ -46,7 +46,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.gcpp_essalud"
+        applicationId "com.essalud.gcpp_essalud"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()
@@ -66,6 +66,11 @@ signingConfigs {
 buildTypes {
     release {
         signingConfig signingConfigs.release
+
+        minifyEnabled true
+            useProguard true
+
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
 }
     /*buildTypes {

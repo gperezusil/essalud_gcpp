@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:881105256691:android:e3d5f94a25eff0f8e9b786",
+        "mobilesdk_app_id": "1:881105256691:android:33af7c13b5cd180be9b786",
         "android_client_info": {
-          "package_name": "com.example.gcpp_essalud"
+          "package_name": "com.essalud.gcpp_essalud"
         }
       },
       "oauth_client": [
