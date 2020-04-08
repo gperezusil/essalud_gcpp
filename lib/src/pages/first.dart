@@ -30,6 +30,7 @@ class _FirstPageState extends State<FirstPage> {
   List<dynamic> prueba2 = new List();
   Future<List<dynamic>> datos;
   StreamSubscription<QuerySnapshot> noteSub;
+  Size media;
   @override
   void initState() {
     listar();
@@ -48,6 +49,7 @@ class _FirstPageState extends State<FirstPage> {
 
   @override
   Widget build(BuildContext context) {
+    media = MediaQuery.of(context).size;
     return Scaffold(
         body: Container(
       child: Padding(
@@ -152,8 +154,8 @@ listar() async{
                             return Column(
                               children: <Widget>[
                                 new CircularPercentIndicator(
-                                  radius: 120.0,
-                                  lineWidth: 13.0,
+                                  radius: MediaQuery.of(context).size.width/3,
+                                  lineWidth:16.0,
                                   animation: true,
                                   percent: me.verificarNumero2(item['porcentaje']),
                                   center: new Text(
@@ -236,8 +238,8 @@ listar() async{
                               return Column(
                                 children: <Widget>[
                                   new CircularPercentIndicator(
-                                    radius: 120.0,
-                                    lineWidth: 13.0,
+                                    radius: MediaQuery.of(context).size.width/3,
+                                    lineWidth: 16.0,
                                     animation: true,
                                     percent:
                                         me.verificarNumero(item['porcentaje']),
@@ -309,7 +311,7 @@ listar() async{
             ],
           ),
         ),
-        height: 250,
+        height: MediaQuery.of(context).size.height/3,
       ),
     );
   }
@@ -335,7 +337,7 @@ listar() async{
                 Column(
                   children: <Widget>[
                     CircularPercentIndicator(
-                      radius: 100,
+                      radius:  MediaQuery.of(context).size.width/3.6,
                       lineWidth: 11.0,
                       animation: true,
                       percent: me.verificarNumero(item['porcentaje']),
@@ -386,8 +388,13 @@ listar() async{
 
   Widget _builCombo(context) {
   
-    return Center(
+    return  Container(
+      alignment: Alignment.topCenter,
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height/15 ,
+       child: Center(
         child: DropdownButton(
+          
             hint: Text("Seleccione Año"),
             value: annoSeleccionado,
             icon: Icon(Icons.arrow_drop_down),
@@ -407,7 +414,7 @@ listar() async{
                   style: TextStyle(color: Colors.black, fontSize: 12),
                 ),
               );
-            }).toList()));
+            }).toList())));
   }
 
   Widget _buildCardDetalleIngresosOperativos(context) {
