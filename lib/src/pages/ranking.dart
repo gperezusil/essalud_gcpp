@@ -139,7 +139,7 @@ class _RankingChartState extends State<RankingChart> {
                       if (!data.hasData) {
                         return Text('Cargando Informacion');
                       }
-                       _seriesDataSede = List<charts.Series<OrdinalSales, String>>();
+                    _seriesDataSede = List<charts.Series<OrdinalSales, String>>();
                       prueba2 = data.data
                           .where((f) =>f.anno == annoSeleccionado)
                           .toList();

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/pages/configuracion.dart';
+import 'package:gcpp_essalud/src/pages/covid.dart';
 import 'package:gcpp_essalud/src/pages/first.dart';
 import 'package:gcpp_essalud/src/pages/inversiones.dart';
 import 'package:gcpp_essalud/src/pages/material.dart';
@@ -71,6 +72,13 @@ Future< List<ScreenHiddenDrawer>> iniciarSesion()async{
           colorLineSelected: Colors.teal,
         ),
         RankingChart()));
+               items.add(new ScreenHiddenDrawer(
+        new ItemHiddenMenu(
+          name: 'COVID-19',
+          baseStyle: TextStyle( color: Colors.white.withOpacity(0.8), fontSize: 16.0 ),
+          colorLineSelected: Colors.teal,
+        ),
+        CovidPage()));
                items.add(new ScreenHiddenDrawer(
         new ItemHiddenMenu(
           name: 'Configuracion',
