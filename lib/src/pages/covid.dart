@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/modelos/redes.dart';
@@ -17,15 +16,21 @@ class CovidPage extends StatefulWidget {
 
 class _CovidPageState extends State<CovidPage> {
   List<charts.Series<TimeSeriesSales, DateTime>> seriesList;
+  List<charts.Series<TimeSeriesSales, DateTime>> seriesVillaPanamericana;
   List<charts.Series<LinearSales, String>> seriesListCircular;
+  List<charts.Series<LinearSales, String>> seriesListCircularSede;
+  final form = new DateFormat('dd/MM/yyyy');
   StreamSubscription<QuerySnapshot> noteSub;
+  StreamSubscription<QuerySnapshot> noteSubVilla;
   StreamSubscription<QuerySnapshot> noteSubFecha;
+  StreamSubscription<QuerySnapshot> noteSubSede;
   CloudService cloud = new CloudService();
   Future<List<dynamic>> datos;
+  Future<List<dynamic>> datosVilla;
+  Future<List<dynamic>> datosSede;
   String red;
-  String fecha;
+  Timestamp fecha;
   bool animate;
-  static double pointerValue;
   Metodos me = new Metodos();
   Redes buscarDireccion;
 
@@ -38,6 +43,8 @@ class _CovidPageState extends State<CovidPage> {
     red = 'TOTAL';
     listar();
     listarFecha();
+    listarVilla();
+    listarSedeCentral();
   }
 
   @override
@@ -55,7 +62,9 @@ class _CovidPageState extends State<CovidPage> {
         SizedBox(
           height: 15,
         ),
-        circularSede(context)
+        circularSede(context),
+        SizedBox(height: 20),
+        _villaDeportiva(context)
       ],
     )));
   }
@@ -84,6 +93,36 @@ class _CovidPageState extends State<CovidPage> {
       }).toList();
       setState(() {
         datos = cloud.convertir(aux);
+      });
+    });
+  }
+
+  listarVilla() async {
+    noteSubVilla?.cancel();
+    List<dynamic> aux = new List();
+    noteSubVilla = cloud.listarDatos('Villa').listen((QuerySnapshot snapshot) {
+      snapshot.documents.map((f) {
+        f.data.values.map((d) {
+          aux.add(d);
+        }).toList();
+      }).toList();
+      setState(() {
+        datosVilla = cloud.convertir(aux);
+      });
+    });
+  }
+
+  listarSedeCentral() async {
+    noteSubSede?.cancel();
+    noteSubSede =
+        cloud.listarDatos('covid-sede').listen((QuerySnapshot snapshot) {
+      List<dynamic> aux = new List();
+      snapshot.documents.map((f) {
+        print(f.data);
+        aux.add(f);
+      }).toList();
+      setState(() {
+        datosSede = cloud.convertir(aux);
       });
     });
   }
@@ -123,22 +162,11 @@ class _CovidPageState extends State<CovidPage> {
         });
   }
 
-  generarData(mydata) {
-    seriesList = new List<charts.Series<TimeSeriesSales, DateTime>>();
-    seriesList.add(charts.Series<TimeSeriesSales, DateTime>(
-      id: 'Sales',
-      colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-      domainFn: (TimeSeriesSales sales, _) => sales.time,
-      measureFn: (TimeSeriesSales sales, _) => sales.sales,
-      measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
-      measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
-      data: mydata,
-    ));
-  }
-
   Widget linear(context) {
     List<dynamic> prueba = new List();
     List<TimeSeriesSales> data2 = new List();
+    List<TimeSeriesSales> data3 = new List();
+    List<TimeSeriesSales> data4 = new List();
     final simpleCurrencyFormatter =
         new charts.BasicNumericTickFormatterSpec.fromNumberFormat(
             new NumberFormat.compact());
@@ -148,66 +176,95 @@ class _CovidPageState extends State<CovidPage> {
           if (!data.hasData) {
             return Center(child: new CircularProgressIndicator());
           }
+          seriesList = new List<charts.Series<TimeSeriesSales, DateTime>>();
           prueba = data.data.where((f) => f['red'] == red).toList();
-          prueba.sort((a,b)=>a['fecha'].toString().compareTo(b['fecha'].toString()));
-          prueba.map((f) => {
+          prueba.sort(
+              (a, b) => a['fecha'].toString().compareTo(b['fecha'].toString()));
+          prueba
+              .map((f) => {
                     data2.add(TimeSeriesSales(
-                        new DateTime(
-                            int.parse(f['fecha'].toString().substring(6, 10)),
-                            int.parse(f['fecha'].toString().substring(3, 5)),
-                            int.parse(f['fecha'].toString().substring(0, 2))),
-                        f['liberado']))
+                        (f['fecha'] as Timestamp).toDate(), f['liberado'])),
+                    data3.add(TimeSeriesSales(
+                        (f['fecha'] as Timestamp).toDate(), f['ejecucion'])),
+                    data4.add(TimeSeriesSales(
+                        (f['fecha'] as Timestamp).toDate(), f['pedido']))
                   })
               .toList();
-        generarData(data2);
+          seriesList.add(charts.Series<TimeSeriesSales, DateTime>(
+            id: 'Cargado',
+            colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+            domainFn: (TimeSeriesSales sales, _) => sales.time,
+            measureFn: (TimeSeriesSales sales, _) => sales.sales,
+            measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
+            measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
+            data: data2,
+          ));
+          seriesList.add(charts.Series<TimeSeriesSales, DateTime>(
+            id: 'Pedidos',
+            colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
+            domainFn: (TimeSeriesSales sales, _) => sales.time,
+            measureFn: (TimeSeriesSales sales, _) => sales.sales,
+            measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
+            measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
+            data: data4,
+          ));
+          seriesList.add(charts.Series<TimeSeriesSales, DateTime>(
+            id: 'Ejecutado',
+            colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
+            domainFn: (TimeSeriesSales sales, _) => sales.time,
+            measureFn: (TimeSeriesSales sales, _) => sales.sales,
+            measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
+            measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
+            data: data3,
+          ));
+
           return LayoutBuilder(builder: (context, constraints) {
             return ConstrainedBox(
-                constraints: BoxConstraints.expand(height: 280.0),
+                constraints: BoxConstraints.expand(height: 350.0),
                 child: IntrinsicHeight(
-                    child: Column(mainAxisSize: MainAxisSize.max, children: <
-                        Widget>[
-                  SizedBox(height: 10),
-                  SizedBox(height: 10),
-                  Text(red,
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Expanded(
-                      child: Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                          child: new charts.TimeSeriesChart(
-                            seriesList,
-                            animate: true,
-                            animationDuration: Duration(seconds: 2),
-                            primaryMeasureAxis: new charts.NumericAxisSpec(
-                                tickFormatterSpec: simpleCurrencyFormatter),
-                            defaultRenderer: new charts.LineRendererConfig(
-                                includePoints: true),
-                            behaviors: [
-                              charts.LinePointHighlighter(
-                                  symbolRenderer: CustomCircleSymbolRenderer()),
-                              new charts.ChartTitle('Fecha',
-                                  behaviorPosition:
-                                      charts.BehaviorPosition.bottom,
-                                  titleOutsideJustification: charts
-                                      .OutsideJustification.middleDrawArea),
-                            ],
-                            selectionModels: [
-                              charts.SelectionModelConfig(changedListener:
-                                  (charts.SelectionModel model) {
-                                if (model.hasDatumSelection)
-                                  pointerValue = double.parse(model
-                                      .selectedSeries[0]
-                                      .measureFn(model.selectedDatum[0].index)
-                                      .toString());
-                              })
-                            ],
-                            dateTimeFactory:
-                                const charts.LocalDateTimeFactory(),
-                          )))
-                ])));
+                    child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                      SizedBox(height: 10),
+                      SizedBox(height: 10),
+                      Text(red,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Expanded(
+                          child: Padding(
+                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                              child: new charts.TimeSeriesChart(
+                                seriesList,
+                                animate: true,
+                                animationDuration: Duration(seconds: 2),
+                                primaryMeasureAxis: new charts.NumericAxisSpec(
+                                    tickFormatterSpec: simpleCurrencyFormatter),
+                                defaultRenderer: new charts.LineRendererConfig(
+                                    includePoints: true),
+                                behaviors: [
+                                  new charts.SeriesLegend(
+                                    position: charts.BehaviorPosition.bottom,
+                                    horizontalFirst: false,
+                                    cellPadding: new EdgeInsets.only(
+                                        right: 4.0, bottom: 4.0),
+                                    showMeasures: true,
+                                  ),
+                                  new charts.ChartTitle('Fecha',
+                                      behaviorPosition:
+                                          charts.BehaviorPosition.bottom,
+                                      titleOutsideJustification: charts
+                                          .OutsideJustification.middleDrawArea),
+                                ],
+                                dateTimeFactory:
+                                    const charts.LocalDateTimeFactory(),
+                              ))),
+                                        SizedBox(height: 10),
+          Text('al ' +form.format(fecha.toDate()),style: TextStyle(color: Colors.grey,fontSize: 18)),
+        SizedBox(height: 10),
+                    ])));
           });
         });
   }
@@ -416,6 +473,10 @@ class _CovidPageState extends State<CovidPage> {
   }
 
   Widget circularSede(context) {
+    if(red=='SEDE CENTRAL'){
+    List<dynamic> prueba = new List();
+    List<LinearSales> data2 = new List();
+
     return ConstrainedBox(
         constraints: BoxConstraints.expand(height: 500.0),
         child: IntrinsicHeight(
@@ -431,56 +492,91 @@ class _CovidPageState extends State<CovidPage> {
                 child: Container(
                     height: 250,
                     child: FutureBuilder(
-                      future: datos,
+                      future: datosSede,
                       builder: (BuildContext context, AsyncSnapshot data) {
                         if (!data.hasData) {
                           return Text('Cargando Informacion');
-                        }
-                        seriesListCircular =
-                            new List<charts.Series<LinearSales, String>>();
-                        final data2 = [
-                          new LinearSales('CEABE', 61.5, Colors.blueAccent),
-                          new LinearSales('LOGIS', 38.1, Colors.redAccent),
-                          new LinearSales('GOF', 0.4, Colors.orangeAccent),
-                        ];
-                        seriesListCircular.add(charts.Series<LinearSales,
-                                String>(
-                            id: 'Sales',
-                            domainFn: (LinearSales sales, _) => sales.year,
-                            measureFn: (LinearSales sales, _) => sales.sales,
-                            colorFn: (LinearSales sales, __) => sales.color,
-                            data: data2,
-                            // Set a label accessor to control the text of the arc label.
-                            labelAccessorFn: (LinearSales row, _) =>
-                                '${row.year}:${row.sales}%'));
+                        } else if (data.connectionState !=
+                            ConnectionState.waiting) {
+                          prueba = data.data
+                              .where((f) => f['fecha'] == fecha)
+                              .toList();
+                          seriesListCircularSede =
+                              new List<charts.Series<LinearSales, String>>();
+                          prueba
+                              .map((f) => {
+                                    if (f['gerencia'] == 'GOF')
+                                      {
+                                        data2.add(new LinearSales(
+                                            f['gerencia'],
+                                            (f['monto'] / f['cargado']) * 100,
+                                            Colors.pinkAccent))
+                                      }
+                                    else if (f['gerencia'] == 'CEABE')
+                                      {
+                                        data2.add(new LinearSales(
+                                            f['gerencia'],
+                                            (f['monto'] / f['cargado']) * 100,
+                                            Colors.blueAccent))
+                                      }
+                                    else
+                                      {
+                                        data2.add(new LinearSales(
+                                            f['gerencia'],
+                                            (f['monto'] / f['cargado']) * 100,
+                                            Colors.redAccent))
+                                      }
+                                  })
+                              .toList();
+                          seriesListCircularSede.add(charts.Series<LinearSales,
+                                  String>(
+                              id: 'Sales',
+                              domainFn: (LinearSales sales, _) => sales.year,
+                              measureFn: (LinearSales sales, _) => sales.sales,
+                              colorFn: (LinearSales sales, __) => sales.color,
+                              data: data2,
+                              // Set a label accessor to control the text of the arc label.
+                              labelAccessorFn: (LinearSales row, _) =>
+                                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
 
-                        return charts.PieChart(
-                          seriesListCircular,
-                          animate: true,
-                          animationDuration: Duration(seconds: 2),
-                          behaviors: [
-                            new charts.DatumLegend(
-                              position: charts.BehaviorPosition.end,
-                            )
-                          ],
-                          defaultRenderer: new charts.ArcRendererConfig(
-                              arcWidth: 80,
-                              arcRendererDecorators: [
-                                new charts.ArcLabelDecorator(
-                                    labelPosition: charts.ArcLabelPosition.auto,
-                                    insideLabelStyleSpec:
-                                        new charts.TextStyleSpec(
-                                            fontSize: 11,
-                                            color: charts.Color.fromHex(
-                                                code: "#000000")))
-                              ]),
-                        );
+                          return 
+                          charts.PieChart(
+                            seriesListCircularSede,
+                            animate: true,
+                            animationDuration: Duration(seconds: 2),
+                            behaviors: [
+                              new charts.DatumLegend(
+                                position: charts.BehaviorPosition.end,
+                              )
+                            ],
+                            defaultRenderer: new charts.ArcRendererConfig(
+                                arcWidth: 80,
+                                arcRendererDecorators: [
+                                  new charts.ArcLabelDecorator(
+                                      labelPosition:
+                                          charts.ArcLabelPosition.auto,
+                                      insideLabelStyleSpec:
+                                          new charts.TextStyleSpec(
+                                              fontSize: 11,
+                                              color: charts.Color.fromHex(
+                                                  code: "#000000")))
+                                ]),
+                          );
+                        }
+                        return SizedBox(height: 1);
                       },
                     ))),
-            Container(
+            FutureBuilder(
+              future: datosSede,
+                      builder: (BuildContext context, AsyncSnapshot data) {
+                        if (!data.hasData) {
+                          return Text('Cargando Informacion');
+                        } else if (data.connectionState !=ConnectionState.waiting) {
+                          prueba = data.data
+                              .where((f) => f['fecha'] == fecha)
+                              .toList();
+            return Container(
                 color: Colors.white,
-                child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
                     child: DataTable(
                       columns: [
                         DataColumn(
@@ -493,65 +589,161 @@ class _CovidPageState extends State<CovidPage> {
                             label: Text("%",
                                 style: TextStyle(fontWeight: FontWeight.bold))),
                       ],
-                      rows: [
-                        DataRow(cells: [
-                          DataCell(Text('CEABE')),
-                          DataCell(Text('Arya')),
-                          DataCell(Text('6')),
-                        ]),
-                        DataRow(cells: [
-                          DataCell(Text('LOGISTICA')),
-                          DataCell(Text('John')),
-                          DataCell(Text('9')),
-                        ]),
-                        DataRow(cells: [
-                          DataCell(Text('GOF')),
-                          DataCell(Text('Tony')),
-                          DataCell(Text('8')),
-                        ]),
-                      ],
+                      rows: prueba.map((f) {
+                  return DataRow(cells: [
+                    DataCell(Text(f['gerencia'])),
+                    DataCell(Text(me
+                        .formatearNumero(double.parse(f['monto'].toString()))
+                        .output
+                        .withoutFractionDigits
+                        .toString())),
+                    DataCell(Text(me
+                        .formatearNumero(double.parse(f['monto'].toString())/double.parse(f['cargado'].toString())* 100)
+                        .output
+                        .compactNonSymbol
+                        .toString()+'%')),
+                  ]);
+                }).toList(),
                       sortColumnIndex: 0,
                       sortAscending: true,
-                    )))
+                    ));
+                    }
+                    return SizedBox(height: 1);
+                    }
+                    )
+                    
           ],
         )));
+    }
+    return SizedBox(height: 1);
+
+  }
+
+  _villaDeportiva(context) {
+    if(red=='SEDE CENTRAL'){
+    return Container(
+      child: Column(
+        children: [
+          Text('Villa Panamericana',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(height: 15),
+          linearVilla(context)
+        ],
+      ),
+    );
+    }
+    return SizedBox(height: 1);
+
+  }
+
+  Widget linearVilla(context) {
+    List<dynamic> prueba = new List();
+    List<TimeSeriesSales> data2 = new List();
+    List<TimeSeriesSales> data3 = new List();
+    List<TimeSeriesSales> data4 = new List();
+    final simpleCurrencyFormatter =
+        new charts.BasicNumericTickFormatterSpec.fromNumberFormat(
+            new NumberFormat.compact());
+    return FutureBuilder(
+        future: datosVilla,
+        builder: (BuildContext context, AsyncSnapshot data) {
+          if (!data.hasData) {
+            return Center(child: new CircularProgressIndicator());
+          }
+          seriesVillaPanamericana =
+              new List<charts.Series<TimeSeriesSales, DateTime>>();
+          prueba = data.data.where((f) => f['red'] == 'TOTAL').toList();
+          prueba.sort((a, b) =>
+              a['fechaVilla'].toString().compareTo(b['fechaVilla'].toString()));
+          prueba
+              .map((f) => {
+                    data2.add(TimeSeriesSales(
+                        (f['fechaVilla'] as Timestamp).toDate(),
+                        f['liberado'])),
+                    data3.add(TimeSeriesSales(
+                        (f['fechaVilla'] as Timestamp).toDate(),
+                        f['ejecucion'])),
+                    data4.add(TimeSeriesSales(
+                        (f['fechaVilla'] as Timestamp).toDate(), f['pedido']))
+                  })
+              .toList();
+          seriesVillaPanamericana.add(charts.Series<TimeSeriesSales, DateTime>(
+            id: 'Cargado',
+            colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+            domainFn: (TimeSeriesSales sales, _) => sales.time,
+            measureFn: (TimeSeriesSales sales, _) => sales.sales,
+            measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
+            measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
+            data: data2,
+          ));
+          seriesVillaPanamericana.add(charts.Series<TimeSeriesSales, DateTime>(
+            id: 'Pedidos',
+            colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
+            domainFn: (TimeSeriesSales sales, _) => sales.time,
+            measureFn: (TimeSeriesSales sales, _) => sales.sales,
+            measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
+            measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
+            data: data4,
+          ));
+          seriesVillaPanamericana.add(charts.Series<TimeSeriesSales, DateTime>(
+            id: 'Ejecutado',
+            colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
+            domainFn: (TimeSeriesSales sales, _) => sales.time,
+            measureFn: (TimeSeriesSales sales, _) => sales.sales,
+            measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
+            measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
+            data: data3,
+          ));
+          return LayoutBuilder(builder: (context, constraints) {
+            return ConstrainedBox(
+                constraints: BoxConstraints.expand(height: 350.0),
+                child: IntrinsicHeight(
+                    child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                      SizedBox(height: 10),
+                      SizedBox(height: 10),
+                      Text(red,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Expanded(
+                          child: Padding(
+                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                              child: new charts.TimeSeriesChart(
+                                seriesVillaPanamericana,
+                                animate: true,
+                                animationDuration: Duration(seconds: 2),
+                                primaryMeasureAxis: new charts.NumericAxisSpec(
+                                    tickFormatterSpec: simpleCurrencyFormatter),
+                                defaultRenderer: new charts.LineRendererConfig(
+                                    includePoints: true),
+                                behaviors: [
+                                  new charts.SeriesLegend(
+                                      position: charts.BehaviorPosition.bottom,
+                                      horizontalFirst: false,
+                                      cellPadding: new EdgeInsets.only(
+                                          right: 4.0, bottom: 4.0),
+                                      showMeasures: true),
+                                  new charts.ChartTitle('Fecha',
+                                      behaviorPosition:
+                                          charts.BehaviorPosition.bottom,
+                                      titleOutsideJustification: charts
+                                          .OutsideJustification.middleDrawArea),
+                                ],
+                                dateTimeFactory:
+                                    const charts.LocalDateTimeFactory(),
+                              )))
+                    ])));
+          });
+        });
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-}
-
-class CustomCircleSymbolRenderer extends charts.CircleSymbolRenderer {
-  Metodos me = new Metodos();
-  @override
-  void paint(charts.ChartCanvas canvas, Rectangle<num> bounds,
-      {List<int> dashPattern,
-      charts.Color fillColor,
-      charts.Color strokeColor,
-      double strokeWidthPx}) {
-    super.paint(canvas, bounds,
-        dashPattern: dashPattern,
-        fillColor: fillColor,
-        strokeColor: strokeColor,
-        strokeWidthPx: strokeWidthPx);
-    canvas.drawRect(
-        Rectangle(bounds.left - 5, bounds.top - 30, bounds.width + 10,
-            bounds.height + 10),
-        fill: charts.Color.white);
-    var textStyle = style.TextStyle();
-    textStyle.color = charts.Color.black;
-    textStyle.fontSize = 12;
-    canvas.drawText(
-        TextElement(
-            me
-                .formatearNumero(_CovidPageState.pointerValue)
-                .output
-                .compactNonSymbol,
-            style: textStyle),
-        (bounds.left).round(),
-        (bounds.top - 28).round());
   }
 }
 

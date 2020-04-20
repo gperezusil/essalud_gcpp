@@ -24,12 +24,9 @@ class CloudService{
   {
       List<dynamic> aux = new List();
       
-        listarDatos(coleccion)
-        .listen((QuerySnapshot snapshot) {
+       listarDatos(coleccion).listen((QuerySnapshot snapshot) {
             snapshot.documents.map((f){
-              f.data.values.map((d){
-               aux.add(d);     
-                }).toList();
+               aux.add(f);     
               }).toList();
     });
    

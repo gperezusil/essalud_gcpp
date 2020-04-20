@@ -154,8 +154,8 @@ listar() async{
                             return Column(
                               children: <Widget>[
                                 new CircularPercentIndicator(
-                                  radius: MediaQuery.of(context).size.width/3,
-                                  lineWidth:16.0,
+                                  radius:120,
+                                  lineWidth:12.0,
                                   animation: true,
                                   percent: me.verificarNumero2(item['porcentaje']),
                                   center: new Text(
@@ -238,8 +238,8 @@ listar() async{
                               return Column(
                                 children: <Widget>[
                                   new CircularPercentIndicator(
-                                    radius: MediaQuery.of(context).size.width/3,
-                                    lineWidth: 16.0,
+                                    radius: 120,
+                                    lineWidth: 12.0,
                                     animation: true,
                                     percent:
                                         me.verificarNumero(item['porcentaje']),
@@ -311,7 +311,7 @@ listar() async{
             ],
           ),
         ),
-        height: MediaQuery.of(context).size.height/3,
+        height: 250,
       ),
     );
   }
@@ -337,7 +337,7 @@ listar() async{
                 Column(
                   children: <Widget>[
                     CircularPercentIndicator(
-                      radius:  MediaQuery.of(context).size.width/3.6,
+                      radius:  90,
                       lineWidth: 11.0,
                       animation: true,
                       percent: me.verificarNumero(item['porcentaje']),
