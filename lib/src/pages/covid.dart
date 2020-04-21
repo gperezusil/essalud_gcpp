@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/modelos/redes.dart';
@@ -6,8 +7,6 @@ import 'package:gcpp_essalud/src/services/firestore.dart';
 import 'package:gcpp_essalud/src/util/metodos.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:intl/intl.dart';
-import 'package:charts_flutter/src/text_element.dart';
-import 'package:charts_flutter/src/text_style.dart' as style;
 
 class CovidPage extends StatefulWidget {
   @override
@@ -641,6 +640,7 @@ class _CovidPageState extends State<CovidPage> {
     List<TimeSeriesSales> data2 = new List();
     List<TimeSeriesSales> data3 = new List();
     List<TimeSeriesSales> data4 = new List();
+    dynamic presupuesto;
     final simpleCurrencyFormatter =
         new charts.BasicNumericTickFormatterSpec.fromNumberFormat(
             new NumberFormat.compact());
@@ -650,7 +650,8 @@ class _CovidPageState extends State<CovidPage> {
           if (!data.hasData) {
             return Center(child: new CircularProgressIndicator());
           }
-          seriesVillaPanamericana =
+          if(data.connectionState!=ConnectionState.waiting){
+                        seriesVillaPanamericana =
               new List<charts.Series<TimeSeriesSales, DateTime>>();
           prueba = data.data.where((f) => f['red'] == 'TOTAL').toList();
           prueba.sort((a, b) =>
@@ -659,12 +660,13 @@ class _CovidPageState extends State<CovidPage> {
               .map((f) => {
                     data2.add(TimeSeriesSales(
                         (f['fechaVilla'] as Timestamp).toDate(),
-                        f['liberado'])),
+                        double.parse(f['liberado'].toString()))),
                     data3.add(TimeSeriesSales(
                         (f['fechaVilla'] as Timestamp).toDate(),
-                        f['ejecucion'])),
+                        double.parse(f['ejecucion'].toString()))),
                     data4.add(TimeSeriesSales(
-                        (f['fechaVilla'] as Timestamp).toDate(), f['pedido']))
+                        (f['fechaVilla'] as Timestamp).toDate(), 
+                        double.parse(f['pedido'].toString())))
                   })
               .toList();
           seriesVillaPanamericana.add(charts.Series<TimeSeriesSales, DateTime>(
@@ -703,9 +705,7 @@ class _CovidPageState extends State<CovidPage> {
                         children: <Widget>[
                       SizedBox(height: 10),
                       SizedBox(height: 10),
-                      Text(red,
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold)),
+                                       
                       SizedBox(
                         height: 5,
                       ),
@@ -738,6 +738,8 @@ class _CovidPageState extends State<CovidPage> {
                               )))
                     ])));
           });
+          }
+          return SizedBox(height: 1);
         });
   }
 
