@@ -18,6 +18,7 @@ class _CovidPageState extends State<CovidPage> {
   List<charts.Series<TimeSeriesSales, DateTime>> seriesVillaPanamericana;
   List<charts.Series<LinearSales, String>> seriesListCircular;
   List<charts.Series<LinearSales, String>> seriesListCircularSede;
+  List<charts.Series<LinearSales, String>> seriesListCircularVilla;
   final form = new DateFormat('dd/MM/yyyy');
   StreamSubscription<QuerySnapshot> noteSub;
   StreamSubscription<QuerySnapshot> noteSubVilla;
@@ -626,7 +627,9 @@ class _CovidPageState extends State<CovidPage> {
           Text('Villa Panamericana',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           SizedBox(height: 15),
-          linearVilla(context)
+          linearVilla(context),
+          SizedBox(height: 15),
+          circularVilla(context)
         ],
       ),
     );
@@ -640,7 +643,6 @@ class _CovidPageState extends State<CovidPage> {
     List<TimeSeriesSales> data2 = new List();
     List<TimeSeriesSales> data3 = new List();
     List<TimeSeriesSales> data4 = new List();
-    dynamic presupuesto;
     final simpleCurrencyFormatter =
         new charts.BasicNumericTickFormatterSpec.fromNumberFormat(
             new NumberFormat.compact());
@@ -741,6 +743,144 @@ class _CovidPageState extends State<CovidPage> {
           }
           return SizedBox(height: 1);
         });
+  }
+  
+  Widget circularVilla(context) {
+    if(red=='SEDE CENTRAL'){
+    List<dynamic> prueba = new List();
+    List<LinearSales> data2 = new List();
+
+    return ConstrainedBox(
+        constraints: BoxConstraints.expand(height: 400.0),
+        child: IntrinsicHeight(
+            child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            SizedBox(height: 10),
+            Expanded(
+                child: Container(
+                    height: 250,
+                    child: FutureBuilder(
+                      future: datosVilla,
+                      builder: (BuildContext context, AsyncSnapshot data) {
+                        if (!data.hasData) {
+                          return Text('Cargando Informacion');
+                        } else if (data.connectionState !=
+                            ConnectionState.waiting) {
+                          prueba = data.data
+                              .where((f) => f['fechaVilla'] == fecha)
+                              .toList();
+                          seriesListCircularVilla =
+                              new List<charts.Series<LinearSales, String>>();
+                          prueba
+                              .map((f) => {
+                                    if (f['red'] == 'INSU Y MAT')
+                                      {
+                                        data2.add(new LinearSales(
+                                            f['red'],
+                                            f['pia'],
+                                            Colors.pinkAccent))
+                                      }
+                                    else if(f['red'] != 'TOTAL')
+                                      {
+                                        data2.add(new LinearSales(
+                                            f['red'],
+                                            f['pia'],
+                                            Colors.redAccent))
+                                      }
+                                  })
+                              .toList();
+                          seriesListCircularVilla.add(charts.Series<LinearSales,
+                                  String>(
+                              id: 'Sales',
+                              domainFn: (LinearSales sales, _) => sales.year,
+                              measureFn: (LinearSales sales, _) => sales.sales,
+                              colorFn: (LinearSales sales, __) => sales.color,
+                              data: data2,
+                              // Set a label accessor to control the text of the arc label.
+                              labelAccessorFn: (LinearSales row, _) =>
+                                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}'));
+
+                          return 
+                          charts.PieChart(
+                            seriesListCircularVilla,
+                            animate: true,
+                            animationDuration: Duration(seconds: 2),
+                            behaviors: [
+                              new charts.DatumLegend(
+                                position: charts.BehaviorPosition.bottom,
+                                horizontalFirst: true,
+                                insideJustification: charts.InsideJustification.topStart
+                              )
+                            ],
+                            defaultRenderer: new charts.ArcRendererConfig(
+                                arcWidth: 80,
+                                arcRendererDecorators: [
+                                  new charts.ArcLabelDecorator(
+                                      labelPosition:
+                                          charts.ArcLabelPosition.auto,
+                                      insideLabelStyleSpec:
+                                          new charts.TextStyleSpec(
+                                              fontSize: 11,
+                                              color: charts.Color.fromHex(
+                                                  code: "#000000")))
+                                ]),
+                          );
+                        }
+                        return SizedBox(height: 1);
+                      },
+                    ))),
+           /* FutureBuilder(
+              future: datosSede,
+                      builder: (BuildContext context, AsyncSnapshot data) {
+                        if (!data.hasData) {
+                          return Text('Cargando Informacion');
+                        } else if (data.connectionState !=ConnectionState.waiting) {
+                          prueba = data.data
+                              .where((f) => f['fecha'] == fecha)
+                              .toList();
+            return Container(
+                color: Colors.white,
+                    child: DataTable(
+                      columns: [
+                        DataColumn(
+                            label: Text("Gerencia",
+                                style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(
+                            label: Text("Monto",
+                                style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(
+                            label: Text("%",
+                                style: TextStyle(fontWeight: FontWeight.bold))),
+                      ],
+                      rows: prueba.map((f) {
+                  return DataRow(cells: [
+                    DataCell(Text(f['gerencia'])),
+                    DataCell(Text(me
+                        .formatearNumero(double.parse(f['monto'].toString()))
+                        .output
+                        .withoutFractionDigits
+                        .toString())),
+                    DataCell(Text(me
+                        .formatearNumero(double.parse(f['monto'].toString())/double.parse(f['cargado'].toString())* 100)
+                        .output
+                        .compactNonSymbol
+                        .toString()+'%')),
+                  ]);
+                }).toList(),
+                      sortColumnIndex: 0,
+                      sortAscending: true,
+                    ));
+                    }
+                    return SizedBox(height: 1);
+                    }
+                    )*/
+                    
+          ],
+        )));
+    }
+    return SizedBox(height: 1);
+
   }
 
   @override
