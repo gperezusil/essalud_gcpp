@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/pages/configuracion.dart';
 import 'package:gcpp_essalud/src/pages/covid.dart';
@@ -8,6 +8,7 @@ import 'package:gcpp_essalud/src/pages/material.dart';
 import 'package:gcpp_essalud/src/pages/ranking.dart';
 import 'package:gcpp_essalud/src/pages/second.dart';
 import 'package:gcpp_essalud/src/pages/sede.dart';
+import 'package:gcpp_essalud/src/pages/villa.dart';
 import 'package:hidden_drawer_menu/hidden_drawer/hidden_drawer_menu.dart';
  
 class HomePage extends StatefulWidget {
@@ -79,6 +80,13 @@ Future< List<ScreenHiddenDrawer>> iniciarSesion()async{
           colorLineSelected: Colors.teal,
         ),
         CovidPage()));
+          items.add(new ScreenHiddenDrawer(
+        new ItemHiddenMenu(
+          name: 'Villa Panamericana',
+          baseStyle: TextStyle( color: Colors.white.withOpacity(0.8), fontSize: 16.0 ),
+          colorLineSelected: Colors.teal,
+        ),
+        VillaPanamericanaPage()));
                items.add(new ScreenHiddenDrawer(
         new ItemHiddenMenu(
           name: 'Configuracion',

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/modelos/redes.dart';
@@ -15,13 +14,10 @@ class CovidPage extends StatefulWidget {
 
 class _CovidPageState extends State<CovidPage> {
   List<charts.Series<TimeSeriesSales, DateTime>> seriesList;
-  List<charts.Series<TimeSeriesSales, DateTime>> seriesVillaPanamericana;
   List<charts.Series<LinearSales, String>> seriesListCircular;
   List<charts.Series<LinearSales, String>> seriesListCircularSede;
-  List<charts.Series<LinearSales, String>> seriesListCircularVilla;
   final form = new DateFormat('dd/MM/yyyy');
   StreamSubscription<QuerySnapshot> noteSub;
-  StreamSubscription<QuerySnapshot> noteSubVilla;
   StreamSubscription<QuerySnapshot> noteSubFecha;
   StreamSubscription<QuerySnapshot> noteSubSede;
   CloudService cloud = new CloudService();
@@ -43,7 +39,6 @@ class _CovidPageState extends State<CovidPage> {
     red = 'TOTAL';
     listar();
     listarFecha();
-    listarVilla();
     listarSedeCentral();
   }
 
@@ -63,8 +58,7 @@ class _CovidPageState extends State<CovidPage> {
           height: 15,
         ),
         circularSede(context),
-        SizedBox(height: 20),
-        _villaDeportiva(context)
+        SizedBox(height: 20)
       ],
     )));
   }
@@ -97,20 +91,6 @@ class _CovidPageState extends State<CovidPage> {
     });
   }
 
-  listarVilla() async {
-    noteSubVilla?.cancel();
-    List<dynamic> aux = new List();
-    noteSubVilla = cloud.listarDatos('Villa').listen((QuerySnapshot snapshot) {
-      snapshot.documents.map((f) {
-        f.data.values.map((d) {
-          aux.add(d);
-        }).toList();
-      }).toList();
-      setState(() {
-        datosVilla = cloud.convertir(aux);
-      });
-    });
-  }
 
   listarSedeCentral() async {
     noteSubSede?.cancel();
@@ -619,269 +599,7 @@ class _CovidPageState extends State<CovidPage> {
 
   }
 
-  _villaDeportiva(context) {
-    if(red=='SEDE CENTRAL'){
-    return Container(
-      child: Column(
-        children: [
-          Text('Villa Panamericana',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 15),
-          linearVilla(context),
-          SizedBox(height: 15),
-          circularVilla(context)
-        ],
-      ),
-    );
-    }
-    return SizedBox(height: 1);
-
-  }
-
-  Widget linearVilla(context) {
-    List<dynamic> prueba = new List();
-    List<TimeSeriesSales> data2 = new List();
-    List<TimeSeriesSales> data3 = new List();
-    List<TimeSeriesSales> data4 = new List();
-    final simpleCurrencyFormatter =
-        new charts.BasicNumericTickFormatterSpec.fromNumberFormat(
-            new NumberFormat.compact());
-    return FutureBuilder(
-        future: datosVilla,
-        builder: (BuildContext context, AsyncSnapshot data) {
-          if (!data.hasData) {
-            return Center(child: new CircularProgressIndicator());
-          }
-          if(data.connectionState!=ConnectionState.waiting){
-                        seriesVillaPanamericana =
-              new List<charts.Series<TimeSeriesSales, DateTime>>();
-          prueba = data.data.where((f) => f['red'] == 'TOTAL').toList();
-          prueba.sort((a, b) =>
-              a['fechaVilla'].toString().compareTo(b['fechaVilla'].toString()));
-          prueba
-              .map((f) => {
-                    data2.add(TimeSeriesSales(
-                        (f['fechaVilla'] as Timestamp).toDate(),
-                        double.parse(f['liberado'].toString()))),
-                    data3.add(TimeSeriesSales(
-                        (f['fechaVilla'] as Timestamp).toDate(),
-                        double.parse(f['ejecucion'].toString()))),
-                    data4.add(TimeSeriesSales(
-                        (f['fechaVilla'] as Timestamp).toDate(), 
-                        double.parse(f['pedido'].toString())))
-                  })
-              .toList();
-          seriesVillaPanamericana.add(charts.Series<TimeSeriesSales, DateTime>(
-            id: 'Cargado',
-            colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-            domainFn: (TimeSeriesSales sales, _) => sales.time,
-            measureFn: (TimeSeriesSales sales, _) => sales.sales,
-            measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
-            measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
-            data: data2,
-          ));
-          seriesVillaPanamericana.add(charts.Series<TimeSeriesSales, DateTime>(
-            id: 'Pedidos',
-            colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
-            domainFn: (TimeSeriesSales sales, _) => sales.time,
-            measureFn: (TimeSeriesSales sales, _) => sales.sales,
-            measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
-            measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
-            data: data4,
-          ));
-          seriesVillaPanamericana.add(charts.Series<TimeSeriesSales, DateTime>(
-            id: 'Ejecutado',
-            colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-            domainFn: (TimeSeriesSales sales, _) => sales.time,
-            measureFn: (TimeSeriesSales sales, _) => sales.sales,
-            measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
-            measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
-            data: data3,
-          ));
-          return LayoutBuilder(builder: (context, constraints) {
-            return ConstrainedBox(
-                constraints: BoxConstraints.expand(height: 350.0),
-                child: IntrinsicHeight(
-                    child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                      SizedBox(height: 10),
-                      SizedBox(height: 10),
-                                       
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Expanded(
-                          child: Padding(
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                              child: new charts.TimeSeriesChart(
-                                seriesVillaPanamericana,
-                                animate: true,
-                                animationDuration: Duration(seconds: 2),
-                                primaryMeasureAxis: new charts.NumericAxisSpec(
-                                    tickFormatterSpec: simpleCurrencyFormatter),
-                                defaultRenderer: new charts.LineRendererConfig(
-                                    includePoints: true),
-                                behaviors: [
-                                  new charts.SeriesLegend(
-                                      position: charts.BehaviorPosition.bottom,
-                                      horizontalFirst: false,
-                                      cellPadding: new EdgeInsets.only(
-                                          right: 4.0, bottom: 4.0),
-                                      showMeasures: true),
-                                  new charts.ChartTitle('Fecha',
-                                      behaviorPosition:
-                                          charts.BehaviorPosition.bottom,
-                                      titleOutsideJustification: charts
-                                          .OutsideJustification.middleDrawArea),
-                                ],
-                                dateTimeFactory:
-                                    const charts.LocalDateTimeFactory(),
-                              )))
-                    ])));
-          });
-          }
-          return SizedBox(height: 1);
-        });
-  }
-  
-  Widget circularVilla(context) {
-    if(red=='SEDE CENTRAL'){
-    List<dynamic> prueba = new List();
-    List<LinearSales> data2 = new List();
-
-    return ConstrainedBox(
-        constraints: BoxConstraints.expand(height: 400.0),
-        child: IntrinsicHeight(
-            child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SizedBox(height: 10),
-            Expanded(
-                child: Container(
-                    height: 250,
-                    child: FutureBuilder(
-                      future: datosVilla,
-                      builder: (BuildContext context, AsyncSnapshot data) {
-                        if (!data.hasData) {
-                          return Text('Cargando Informacion');
-                        } else if (data.connectionState !=
-                            ConnectionState.waiting) {
-                          prueba = data.data
-                              .where((f) => f['fechaVilla'] == fecha)
-                              .toList();
-                          seriesListCircularVilla =
-                              new List<charts.Series<LinearSales, String>>();
-                          prueba
-                              .map((f) => {
-                                    if (f['red'] == 'INSU Y MAT')
-                                      {
-                                        data2.add(new LinearSales(
-                                            f['red'],
-                                            f['pia'],
-                                            Colors.pinkAccent))
-                                      }
-                                    else if(f['red'] != 'TOTAL')
-                                      {
-                                        data2.add(new LinearSales(
-                                            f['red'],
-                                            f['pia'],
-                                            Colors.redAccent))
-                                      }
-                                  })
-                              .toList();
-                          seriesListCircularVilla.add(charts.Series<LinearSales,
-                                  String>(
-                              id: 'Sales',
-                              domainFn: (LinearSales sales, _) => sales.year,
-                              measureFn: (LinearSales sales, _) => sales.sales,
-                              colorFn: (LinearSales sales, __) => sales.color,
-                              data: data2,
-                              // Set a label accessor to control the text of the arc label.
-                              labelAccessorFn: (LinearSales row, _) =>
-                                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}'));
-
-                          return 
-                          charts.PieChart(
-                            seriesListCircularVilla,
-                            animate: true,
-                            animationDuration: Duration(seconds: 2),
-                            behaviors: [
-                              new charts.DatumLegend(
-                                position: charts.BehaviorPosition.bottom,
-                                horizontalFirst: true,
-                                insideJustification: charts.InsideJustification.topStart
-                              )
-                            ],
-                            defaultRenderer: new charts.ArcRendererConfig(
-                                arcWidth: 80,
-                                arcRendererDecorators: [
-                                  new charts.ArcLabelDecorator(
-                                      labelPosition:
-                                          charts.ArcLabelPosition.auto,
-                                      insideLabelStyleSpec:
-                                          new charts.TextStyleSpec(
-                                              fontSize: 11,
-                                              color: charts.Color.fromHex(
-                                                  code: "#000000")))
-                                ]),
-                          );
-                        }
-                        return SizedBox(height: 1);
-                      },
-                    ))),
-           /* FutureBuilder(
-              future: datosSede,
-                      builder: (BuildContext context, AsyncSnapshot data) {
-                        if (!data.hasData) {
-                          return Text('Cargando Informacion');
-                        } else if (data.connectionState !=ConnectionState.waiting) {
-                          prueba = data.data
-                              .where((f) => f['fecha'] == fecha)
-                              .toList();
-            return Container(
-                color: Colors.white,
-                    child: DataTable(
-                      columns: [
-                        DataColumn(
-                            label: Text("Gerencia",
-                                style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(
-                            label: Text("Monto",
-                                style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(
-                            label: Text("%",
-                                style: TextStyle(fontWeight: FontWeight.bold))),
-                      ],
-                      rows: prueba.map((f) {
-                  return DataRow(cells: [
-                    DataCell(Text(f['gerencia'])),
-                    DataCell(Text(me
-                        .formatearNumero(double.parse(f['monto'].toString()))
-                        .output
-                        .withoutFractionDigits
-                        .toString())),
-                    DataCell(Text(me
-                        .formatearNumero(double.parse(f['monto'].toString())/double.parse(f['cargado'].toString())* 100)
-                        .output
-                        .compactNonSymbol
-                        .toString()+'%')),
-                  ]);
-                }).toList(),
-                      sortColumnIndex: 0,
-                      sortAscending: true,
-                    ));
-                    }
-                    return SizedBox(height: 1);
-                    }
-                    )*/
-                    
-          ],
-        )));
-    }
-    return SizedBox(height: 1);
-
-  }
+   
 
   @override
   void dispose() {
