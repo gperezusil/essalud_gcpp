@@ -333,7 +333,8 @@ listar() async{
             spacing: 20.0, // gap between adjacent chips
             runSpacing: 8.0, // gap between lines
             children: lista.map((item) {
-              return new Wrap(children: <Widget>[
+              return new Wrap(
+                children: <Widget>[
                 Column(
                   children: <Widget>[
                     CircularPercentIndicator(

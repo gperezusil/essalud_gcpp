@@ -98,7 +98,6 @@ class _CovidPageState extends State<CovidPage> {
         cloud.listarDatos('covid-sede').listen((QuerySnapshot snapshot) {
       List<dynamic> aux = new List();
       snapshot.documents.map((f) {
-        print(f.data);
         aux.add(f);
       }).toList();
       setState(() {
@@ -456,7 +455,6 @@ class _CovidPageState extends State<CovidPage> {
     if(red=='SEDE CENTRAL'){
     List<dynamic> prueba = new List();
     List<LinearSales> data2 = new List();
-
     return ConstrainedBox(
         constraints: BoxConstraints.expand(height: 500.0),
         child: IntrinsicHeight(
@@ -628,7 +626,17 @@ class LinearSales {
   final double sales;
   final charts.Color color;
 
-  LinearSales(this.year, this.sales, Color color)
+  LinearSales(this.year, this.sales, Color color,)
+      : this.color = new charts.Color(
+            r: color.red, g: color.green, b: color.blue, a: color.alpha);
+}
+class LinearSalesRubro {
+  final String year;
+  final double sales;
+  final String rubro;
+  final charts.Color color;
+  
+  LinearSalesRubro(this.year, this.sales,this.rubro, Color color,)
       : this.color = new charts.Color(
             r: color.red, g: color.green, b: color.blue, a: color.alpha);
 }
