@@ -20,8 +20,11 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
   List<charts.Series<TimeSeriesSales, DateTime>> seriesVillaPanamericana;
   List<charts.Series<LinearSales, String>> seriesListCircularVilla;
   Future<List<dynamic>> datosVilla;
+  Future<List<dynamic>> datosVilla2;
   StreamSubscription<QuerySnapshot> noteSubVilla;
+  StreamSubscription<QuerySnapshot> noteSubVilla2;
   StreamSubscription<QuerySnapshot> noteSubFecha;
+  String etapa;
   Timestamp fecha;
   final form = new DateFormat('dd/MM/yyyy');
   double presupuestoCargado;
@@ -53,12 +56,28 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
       });
     });
   }
+    listarVilla2() async {
+    noteSubVilla2?.cancel();
+    List<dynamic> aux = new List();
+    noteSubVilla2 = cloud.listarDatos('Villa-2').listen((QuerySnapshot snapshot) {
+      snapshot.documents.map((f) {
+        f.data.values.map((d) {
+          aux.add(d);
+        }).toList();
+      }).toList();
+      setState(() {
+        datosVilla2 = cloud.convertir(aux);
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    etapa ="Etapa 1";
     listarFecha();
     listarVilla();
+    listarVilla2();
   }
 
   @override
@@ -76,7 +95,9 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
       child: Container(
         child: Column(
           children: [
-            Text('Etapa 1',
+            _builCombo(context),
+            SizedBox(height: 15),
+            Text(etapa,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             SizedBox(height: 15),
             linearVilla(context),
@@ -92,7 +113,35 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
     );
   }
 
+  Widget _builCombo(context) {
+    var array = ['Etapa 1','Etapa 2']; 
+          return DropdownButton(
+              hint: Text("Seleccione Red"),
+              value: etapa,
+              icon: Icon(Icons.arrow_drop_down),
+              iconSize: 24,
+              elevation: 16,
+              style: TextStyle(color: Colors.black, fontSize: 15),
+              onChanged: (String ge) {
+                setState(() {
+                  etapa = ge;
+                });
+              },
+              items: array.map((dynamic valor) {
+                return DropdownMenuItem<String>(
+                  value: valor,
+                  child: Text(
+                    valor,
+                    style: TextStyle(color: Colors.black, fontSize: 12),
+                  ),
+                );
+              }).toList());
+        
+  }
   Widget linearVilla(context) {
+    if(etapa=='Etapa 1'){
+      
+    }
     List<dynamic> prueba = new List();
     List<TimeSeriesSales> data2 = new List();
     List<TimeSeriesSales> data3 = new List();
