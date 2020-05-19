@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/preferencias_usuario/preferencias_usuario.dart';
 import 'package:gcpp_essalud/src/screen/changePass.dart';
@@ -17,9 +18,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
       final prefs = new PreferenciasUsuario();
-    return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return  CupertinoApp(
+      theme: CupertinoThemeData(
+        primaryColor: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
       title: 'Ejecucion Presupuestal',

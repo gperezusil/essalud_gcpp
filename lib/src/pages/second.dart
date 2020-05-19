@@ -7,13 +7,15 @@ import 'package:gcpp_essalud/src/pages/detalleRed.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-
+import 'package:location/location.dart';
 class SecondPage extends StatefulWidget {
   @override
   _SecondPageState createState() => _SecondPageState();
 }
 
 class _SecondPageState extends State<SecondPage> {
+   final Location location = Location();
+  LocationData _location;
   GoogleMapController _controller;
   List<Redes> redes;
   Position position;
@@ -39,7 +41,11 @@ class _SecondPageState extends State<SecondPage> {
   
   }
 
- 
+ Future<LocationData> _getLocation() async{
+   _location= await location.getLocation();
+
+   return _location;
+ }
 
 
 
@@ -55,12 +61,12 @@ class _SecondPageState extends State<SecondPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: FutureBuilder(
-            future: _getCurrentLocation(),
+            future: _getLocation(),
             builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
               if (!snapshot.hasData) {
                 return Center(child: new CircularProgressIndicator());
               }
-              return _mapWidget(context);
+              return _mapWidget(context,snapshot);
             }));
   }
 
@@ -77,7 +83,7 @@ class _SecondPageState extends State<SecondPage> {
     return position;
   }
 
-  Widget _mapWidget(context) {
+  Widget _mapWidget(context,AsyncSnapshot<dynamic> datos) {
     return SlidingUpPanel(
       maxHeight:MediaQuery.of(context).size.height * .70 ,
       body: Stack(
@@ -85,7 +91,7 @@ class _SecondPageState extends State<SecondPage> {
           GoogleMap(
             onMapCreated: onMapCreated,
             initialCameraPosition: CameraPosition(
-                target: LatLng(position.latitude, position.longitude),
+                target: LatLng(datos.data.latitude, datos.data.longitude),
                 zoom: 5.0),
             mapType: MapType.normal,
             markers: {

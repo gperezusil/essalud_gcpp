@@ -7,7 +7,7 @@ import 'package:gcpp_essalud/src/util/metodos.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:permission_handler/permission_handler.dart';
+
 
 class FirstPage extends StatefulWidget {
   @override
@@ -15,6 +15,7 @@ class FirstPage extends StatefulWidget {
 }
 
 class _FirstPageState extends State<FirstPage> {
+ 
   List<dynamic> lista;
   List<dynamic> detalleLista;
   String titulo,detalle,detalledetalle,annoSeleccionado;
@@ -34,7 +35,7 @@ class _FirstPageState extends State<FirstPage> {
   @override
   void initState() {
     listar();
-    getPermision();
+    
     super.initState();
     colorRubroIngresos = Colors.purple;
     colorRubroEgresos = Colors.lime[50];
@@ -45,7 +46,10 @@ class _FirstPageState extends State<FirstPage> {
     anno = new List();
     anno.add('2019');
     anno.add('2020');
+
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -91,34 +95,6 @@ listar() async{
               
     });
 }
-
-
-  Future<void> getPermision() async {
-    PermissionStatus permision = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.location);
-    if (permision == PermissionStatus.denied) {
-      await PermissionHandler()
-          .requestPermissions([PermissionGroup.locationAlways]);
-    }
-    var geolocator = Geolocator();
-
-    GeolocationStatus geolocationStatus =
-        await geolocator.checkGeolocationPermissionStatus();
-
-    switch (geolocationStatus) {
-      case GeolocationStatus.denied:
-        break;
-      case GeolocationStatus.disabled:
-        break;
-      case GeolocationStatus.restricted:
-        break;
-      case GeolocationStatus.unknown:
-        break;
-      case GeolocationStatus.granted:
-
-      //_getCurrentLocation();
-    }
-  }
 
 
 

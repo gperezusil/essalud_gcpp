@@ -16,6 +16,10 @@ version: 1.2.0+3
 environment:
   sdk: ">=2.2.2 <3.0.0"
 
+flutter_icons:
+  image_path: 'local/logo.png'
+  android: true
+  ios: true
 dependencies:
   flutter:
     sdk: flutter
@@ -27,13 +31,15 @@ dependencies:
   cloud_firestore: ^0.13.0+1
   flutter_money_formatter: ^0.8.3
   geolocator: ^5.2.0
-  permission_handler: ^4.1.0
+  location: ^3.0.0
   google_maps_flutter: ^0.5.19
   sliding_up_panel: ^0.3.6
   firebase_auth: ^0.15.4
   charts_flutter: ^0.8.1
   flutter_login: ^1.0.14
   shared_preferences: ^0.5.6+2
+  path_provider: ^1.6.1
+  flutter_launcher_icons: ^0.7.5
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -54,6 +60,9 @@ flutter:
   assets:
   - local/redes.json
   - local/ic_launcher.png
+
+
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

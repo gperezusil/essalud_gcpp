@@ -16,13 +16,11 @@ class RankingChart extends StatefulWidget {
 class _RankingChartState extends State<RankingChart> {
   final f = new DateFormat('dd-MM-yyyy');
   final form = new DateFormat('dd/MM/yyyy');
-  String fecha;
   List<charts.Series<OrdinalSales, String>> _seriesDataRedes; 
   List<charts.Series<OrdinalSales, String>> _seriesDataSede; 
   StreamSubscription<QuerySnapshot> noteSub;
   Future<List<dynamic>> datos;
   Future<List<dynamic>> datosSede;
-  Future<String> fech;
   List<OrdinalSales> prueba;
   List<OrdinalSales> prueba2;
   String annoSeleccionado;
@@ -42,7 +40,7 @@ class _RankingChartState extends State<RankingChart> {
   }
   @override
   Widget build(BuildContext context) {
-    
+    String fechota;
     // For horizontal bar charts, set the [vertical] flag to false.
     return Scaffold(
         body: LayoutBuilder(builder: (context, constraints) {
@@ -61,18 +59,6 @@ class _RankingChartState extends State<RankingChart> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20.0)),
                                        SizedBox(height: 5),
-                                         FutureBuilder(
-                    future: fech,
-                    builder: (BuildContext context, AsyncSnapshot data) {
-                      if (!data.hasData) {
-                        return Text('Cargando Informacion');
-                      }
-                       return       Text(form.format(
-                                      f.parse(data.data).toLocal()),
-                     style: new TextStyle(color: Colors.grey,
-                                    fontSize: 15.0));
-                    },
-                  ),
                     Expanded(
                       child: Container(
                         child: 
@@ -90,6 +76,9 @@ class _RankingChartState extends State<RankingChart> {
                       prueba = data.data
                           .where((f) =>f.anno == annoSeleccionado)
                           .toList();
+                      prueba.map((response)=>{
+                        fechota=response.fecha
+                      }).toList();    
                              _seriesDataRedes.add(
                             charts.Series<OrdinalSales, String>(
                              id: 'Sales',
@@ -102,6 +91,16 @@ class _RankingChartState extends State<RankingChart> {
                       _seriesDataRedes,
                       vertical: false,
                       animate: true,
+                      behaviors: [
+        new charts.ChartTitle(form.format(f.parse(fechota).toLocal()),
+            behaviorPosition: charts.BehaviorPosition.top,
+            titleOutsideJustification:
+                charts.OutsideJustification.middleDrawArea,
+            // Set a larger inner padding than the default (10) to avoid
+            // rendering the text too close to the top measure axis tick label.
+            // The top tick label may extend upwards into the top margin region
+            // if it is located at the top of the draw area.
+            innerPadding: 18)],
                       animationDuration: Duration(seconds: 3),
                        barRendererDecorator: new charts.BarLabelDecorator<String>(),
 
@@ -114,18 +113,6 @@ class _RankingChartState extends State<RankingChart> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20.0)),
                                        SizedBox(height: 5),
-                                         FutureBuilder(
-                    future: fech,
-                    builder: (BuildContext context, AsyncSnapshot data) {
-                      if (!data.hasData) {
-                        return Text('Cargando Informacion');
-                      }
-                       return       Text(form.format(
-                                      f.parse(data.data).toLocal()),
-                     style: new TextStyle(color: Colors.grey,
-                                    fontSize: 15.0));
-                    },
-                  ),
                     Expanded(
                       child: Container(
                         child: 
@@ -155,6 +142,17 @@ class _RankingChartState extends State<RankingChart> {
                       _seriesDataSede,
                       vertical: false,
                       animate: true,
+                                                  behaviors: [
+        new charts.ChartTitle(
+          form.format(f.parse(fechota).toLocal()),
+            behaviorPosition: charts.BehaviorPosition.top,
+            titleOutsideJustification:
+                charts.OutsideJustification.middleDrawArea,
+            // Set a larger inner padding than the default (10) to avoid
+            // rendering the text too close to the top measure axis tick label.
+            // The top tick label may extend upwards into the top margin region
+            // if it is located at the top of the draw area.
+            innerPadding: 18)],
                       animationDuration: Duration(seconds: 3),
                        barRendererDecorator: new charts.BarLabelDecorator<String>(),
 
@@ -173,13 +171,11 @@ listar() async{
    
             snapshot.documents.map((f){
               f.data.values.map((d){
-               valores.add(new OrdinalSales(d['red'],double.parse(me.formatearNumero(d['porcentaje'] * 100).output.compactNonSymbol),d['anno']));
+               valores.add(new OrdinalSales(d['red'],double.parse(me.formatearNumero(d['porcentaje'] * 100).output.compactNonSymbol),d['anno'],d['fecha']));
                valores.sort((a, b) => b.sales.compareTo(a.sales));
-               fecha=d['fecha'];  
                 }).toList();
                 setState(() {
                 datos = cloud.convertir(valores); 
-                fech = cloud.convertirFecha(fecha);
               });
               }).toList();
               
@@ -189,9 +185,8 @@ noteSub= cloud.listarDatos('RankingSede').listen((QuerySnapshot snapshot) {
    List<OrdinalSales> valores = new List();
             snapshot.documents.map((f){
               f.data.values.map((d){
-               valores.add(new OrdinalSales(d['siglas'],double.parse(me.formatearNumero(d['porcentaje'] * 100).output.compactNonSymbol),d['anno']));
+               valores.add(new OrdinalSales(d['siglas'],double.parse(me.formatearNumero(d['porcentaje'] * 100).output.compactNonSymbol),d['anno'],d['fecha']));
                valores.sort((a, b) => b.sales.compareTo(a.sales));
-               fecha=d['fecha'];  
                 }).toList();
                 setState(() {
                 datosSede = cloud.convertir(valores); 
@@ -234,6 +229,6 @@ class OrdinalSales {
   final String year;
   final double sales;
   final String anno;
-
-  OrdinalSales(this.year, this.sales,this.anno);
+  final String fecha;
+  OrdinalSales(this.year, this.sales,this.anno,this.fecha);
 }

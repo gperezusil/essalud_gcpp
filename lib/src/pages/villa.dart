@@ -278,7 +278,7 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
                     data2.add(new LinearSales(
                         'Ejecu',
                         (f['ejecucion'] / f['liberado']) * 100,
-                        Colors.pinkAccent)),
+                        Colors.purple)),
                     data2.add(new LinearSales(
                         'Reser',
                         (f['reserva'] / f['liberado']) * 100,
@@ -486,7 +486,7 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
                 'Ejecu',
                 (f['ejecucion'] / f['liberado']) * 100,
                 f['red'],
-                Colors.pinkAccent));
+                Colors.purple));
             data2.add(new LinearSalesRubro(
                 'Reser',
                 (f['reserva'] / f['liberado']) * 100,

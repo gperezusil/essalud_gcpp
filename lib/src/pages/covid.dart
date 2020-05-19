@@ -269,7 +269,7 @@ class _CovidPageState extends State<CovidPage> {
                     data2.add(new LinearSales(
                         'Ejecu',
                         (f['ejecucion'] / f['liberado']) * 100,
-                        Colors.pinkAccent)),
+                        Colors.purple)),
                     data2.add(new LinearSales(
                         'Saldo',
                         (f['saldoLiberado'] / f['liberado']) * 100,
@@ -488,7 +488,7 @@ class _CovidPageState extends State<CovidPage> {
                                         data2.add(new LinearSales(
                                             f['gerencia'],
                                             (f['monto'] / f['cargado']) * 100,
-                                            Colors.pinkAccent))
+                                            Colors.purple))
                                       }
                                     else if (f['gerencia'] == 'CEABE')
                                       {
