@@ -13,7 +13,6 @@ class LoginPage extends StatelessWidget {
     return FlutterLogin(
       title: 'GCPP',
       onLogin: _authUser,
-      onSignup: _authUser,
       onSubmitAnimationCompleted: () {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => ChangePassword(),
@@ -23,11 +22,7 @@ class LoginPage extends StatelessWidget {
       messages: LoginMessages(
           usernameHint: 'Correo',
           passwordHint: 'Contraseña',
-          loginButton: 'Ingresar',
-          signupButton: 'Registrar',
-          forgotPasswordButton: '¿Olvidaste la Contraseña ?'),
-          
-      //onRecoverPassword: _recoverPassword,
+          loginButton: 'Ingresar'),
       theme: LoginTheme(
         titleStyle: TextStyle(
           color: Colors.white,

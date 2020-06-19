@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:gcpp_essalud/src/modelos/redes.dart';
 import 'package:gcpp_essalud/src/util/metodos.dart';
 import 'package:gcpp_essalud/src/pages/detalleRed.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:location/location.dart';
@@ -18,7 +17,6 @@ class _SecondPageState extends State<SecondPage> {
   LocationData _location;
   GoogleMapController _controller;
   List<Redes> redes;
-  Position position;
   List<Widget> details = [];
   PanelController _pc = new PanelController();
   Metodos me = new Metodos();
@@ -78,10 +76,7 @@ class _SecondPageState extends State<SecondPage> {
     );
   }
 
-  Future<Position> _getCurrentLocation() async {
-    await Geolocator().getCurrentPosition().then((response) =>position=response);
-    return position;
-  }
+
 
   Widget _mapWidget(context,AsyncSnapshot<dynamic> datos) {
     return SlidingUpPanel(

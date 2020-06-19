@@ -2,10 +2,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/services/firestore.dart';
-
 import 'package:gcpp_essalud/src/util/metodos.dart';
 import 'package:intl/intl.dart';
-
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class MaterialEstrategico extends StatefulWidget {

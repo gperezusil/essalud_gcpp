@@ -73,7 +73,7 @@ Future< List<ScreenHiddenDrawer>> iniciarSesion()async{
           colorLineSelected: Colors.teal,
         ),
         RankingChart()));
-               items.add(new ScreenHiddenDrawer(
+            /*   items.add(new ScreenHiddenDrawer(
         new ItemHiddenMenu(
           name: 'COVID-19',
           baseStyle: TextStyle( color: Colors.white.withOpacity(0.8), fontSize: 16.0 ),
@@ -86,7 +86,7 @@ Future< List<ScreenHiddenDrawer>> iniciarSesion()async{
           baseStyle: TextStyle( color: Colors.white.withOpacity(0.8), fontSize: 16.0 ),
           colorLineSelected: Colors.teal,
         ),
-        VillaPanamericanaPage()));
+        VillaPanamericanaPage()));*/
                items.add(new ScreenHiddenDrawer(
         new ItemHiddenMenu(
           name: 'Configuracion',
