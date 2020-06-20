@@ -13,8 +13,10 @@ class SecondPage extends StatefulWidget {
 }
 
 class _SecondPageState extends State<SecondPage> {
-   final Location location = Location();
+  final Location location = Location();
+  PermissionStatus _permissionGranted;
   LocationData _location;
+  String _error='ee';
   GoogleMapController _controller;
   List<Redes> redes;
   List<Widget> details = [];
@@ -25,7 +27,40 @@ class _SecondPageState extends State<SecondPage> {
   Widget wid;
   var data;
 
-  loadJsonData() async {
+
+
+  Future<void>    _checkPermissions() async {
+    final PermissionStatus permissionGrantedResult =
+        await location.hasPermission();
+      if(permissionGrantedResult!=PermissionStatus.granted){
+          _requestPermission();
+      }
+       setState(() {
+          _permissionGranted=permissionGrantedResult;
+      });
+  }
+
+   Future<void> _requestPermission() async {
+    if (_permissionGranted != PermissionStatus.granted) {
+      final PermissionStatus permissionRequestedResult =
+          await location.requestPermission();
+      setState(() {
+        _permissionGranted = permissionRequestedResult;
+      });
+      if (permissionRequestedResult != PermissionStatus.granted) {
+        return;
+      }
+    }
+  }
+  Future<LocationData> _getLocation() async {
+      _location = await location.getLocation();
+
+      return  _location;
+    
+  }
+  
+
+loadJsonData() async {
     String jsonText = await rootBundle.loadString('local/redes.json');
     setState(() {
       data = json.decode(jsonText);
@@ -39,33 +74,51 @@ class _SecondPageState extends State<SecondPage> {
   
   }
 
- Future<LocationData> _getLocation() async{
-   _location= await location.getLocation();
-
-   return _location;
- }
-
-
 
   @override
   void initState() {
     super.initState();
-    loadJsonData();
+    _checkPermissions();
+   loadJsonData();
     details.add(DetalleRed(red: 'TOTAL'));
   
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    if(_permissionGranted==PermissionStatus.granted){
+            return Scaffold(
         body: FutureBuilder(
             future: _getLocation(),
             builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
               if (!snapshot.hasData) {
                 return Center(child: new CircularProgressIndicator());
               }
-              return _mapWidget(context,snapshot);
+             return _mapWidget(context,snapshot);
             }));
+    }else{
+     
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text('Se requiere ubicacion para mostrar esta informacion.'),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: RaisedButton.icon(
+                icon: Icon(Icons.location_on,color: Colors.white,),
+                onPressed: () {
+                  _checkPermissions();
+                },
+                color: Colors.blue,
+                label: Text("Permitir Ubicacion", style: TextStyle(color: Colors.white),),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
   }
 
   Widget _panel(context) {
