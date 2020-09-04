@@ -19,27 +19,23 @@ class _CovidPageState extends State<CovidPage> {
   final form = new DateFormat('dd/MM/yyyy');
   StreamSubscription<QuerySnapshot> noteSub;
   StreamSubscription<QuerySnapshot> noteSubFecha;
-  StreamSubscription<QuerySnapshot> noteSubSede;
   CloudService cloud = new CloudService();
   Future<List<dynamic>> datos;
   Future<List<dynamic>> datosVilla;
-  Future<List<dynamic>> datosSede;
   String red;
   Timestamp fecha;
   bool animate;
   Metodos me = new Metodos();
   Redes buscarDireccion;
-
   Widget wid;
   var data;
 
   @override
   void initState() {
     super.initState();
-    red = 'TOTAL';
-    listar();
     listarFecha();
-    listarSedeCentral();
+    listar();
+    red = 'TOTAL';
   }
 
   @override
@@ -50,15 +46,20 @@ class _CovidPageState extends State<CovidPage> {
       children: <Widget>[
         _builCombo(context),
         SizedBox(height: 10),
-        linear(context),
-        circular(context),
-        Text('', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Center(
+            child: Text(
+          red,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        )),
+        SizedBox(height: 20),
+        circularOperativo(context),
+        SizedBox(height: 20),
         detalle(context),
-        SizedBox(
-          height: 15,
-        ),
-        circularSede(context),
-        SizedBox(height: 20)
+        SizedBox(height: 20),
+        circularCapital(context),
+        SizedBox(height: 20),
+        detalleCapital(context),
       ],
     )));
   }
@@ -79,11 +80,10 @@ class _CovidPageState extends State<CovidPage> {
   listar() async {
     noteSub?.cancel();
     List<dynamic> aux = new List();
-    noteSub = cloud.listarDatos('Covid').listen((QuerySnapshot snapshot) {
+    noteSub = cloud.listarDatos('Covid-red').listen((QuerySnapshot snapshot) {
       snapshot.documents.map((f) {
-        f.data.values.map((d) {
-          aux.add(d);
-        }).toList();
+        print(f.data);
+        aux.add(f);
       }).toList();
       setState(() {
         datos = cloud.convertir(aux);
@@ -91,164 +91,32 @@ class _CovidPageState extends State<CovidPage> {
     });
   }
 
-
-  listarSedeCentral() async {
-    noteSubSede?.cancel();
-    noteSubSede =
-        cloud.listarDatos('covid-sede').listen((QuerySnapshot snapshot) {
-      List<dynamic> aux = new List();
-      snapshot.documents.map((f) {
-        aux.add(f);
-      }).toList();
-      setState(() {
-        datosSede = cloud.convertir(aux);
-      });
-    });
-  }
-
   Widget _builCombo(context) {
-    List<dynamic> prueba = new List();
-    return FutureBuilder(
-        future: datos,
-        builder: (BuildContext context, AsyncSnapshot data) {
-          if (!data.hasData) {
-            return Center(child: new CircularProgressIndicator());
-          }
-          prueba = data.data.where((f) => f['fecha'] == fecha).toList();
-          prueba.sort(
-              (a, b) => a['red'].toString().compareTo(b['red'].toString()));
-          return DropdownButton(
-              hint: Text("Seleccione Red"),
-              value: red,
-              icon: Icon(Icons.arrow_drop_down),
-              iconSize: 24,
-              elevation: 16,
-              style: TextStyle(color: Colors.black, fontSize: 15),
-              onChanged: (String ge) {
-                setState(() {
-                  red = ge;
-                });
-              },
-              items: prueba.map((dynamic valor) {
-                return DropdownMenuItem<String>(
-                  value: valor['red'],
-                  child: Text(
-                    valor['red'],
-                    style: TextStyle(color: Colors.black, fontSize: 12),
-                  ),
-                );
-              }).toList());
-        });
-  }
-
-  Widget linear(context) {
-    List<dynamic> prueba = new List();
-    List<TimeSeriesSales> data2 = new List();
-    List<TimeSeriesSales> data3 = new List();
-    List<TimeSeriesSales> data4 = new List();
-    final simpleCurrencyFormatter =
-        new charts.BasicNumericTickFormatterSpec.fromNumberFormat(
-            new NumberFormat.compact());
-    return FutureBuilder(
-        future: datos,
-        builder: (BuildContext context, AsyncSnapshot data) {
-          if (!data.hasData) {
-            return Center(child: new CircularProgressIndicator());
-          }
-          seriesList = new List<charts.Series<TimeSeriesSales, DateTime>>();
-          prueba = data.data.where((f) => f['red'] == red).toList();
-          prueba.sort(
-              (a, b) => a['fecha'].toString().compareTo(b['fecha'].toString()));
-          prueba
-              .map((f) => {
-                    data2.add(TimeSeriesSales(
-                        (f['fecha'] as Timestamp).toDate(), f['liberado'])),
-                    data3.add(TimeSeriesSales(
-                        (f['fecha'] as Timestamp).toDate(), f['ejecucion'])),
-                    data4.add(TimeSeriesSales(
-                        (f['fecha'] as Timestamp).toDate(), f['pedido']))
-                  })
-              .toList();
-          seriesList.add(charts.Series<TimeSeriesSales, DateTime>(
-            id: 'Cargado',
-            colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-            domainFn: (TimeSeriesSales sales, _) => sales.time,
-            measureFn: (TimeSeriesSales sales, _) => sales.sales,
-            measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
-            measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
-            data: data2,
-          ));
-          seriesList.add(charts.Series<TimeSeriesSales, DateTime>(
-            id: 'Pedidos',
-            colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
-            domainFn: (TimeSeriesSales sales, _) => sales.time,
-            measureFn: (TimeSeriesSales sales, _) => sales.sales,
-            measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
-            measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
-            data: data4,
-          ));
-          seriesList.add(charts.Series<TimeSeriesSales, DateTime>(
-            id: 'Ejecutado',
-            colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-            domainFn: (TimeSeriesSales sales, _) => sales.time,
-            measureFn: (TimeSeriesSales sales, _) => sales.sales,
-            measureLowerBoundFn: (TimeSeriesSales sales, _) => sales.sales - 5,
-            measureUpperBoundFn: (TimeSeriesSales sales, _) => sales.sales + 5,
-            data: data3,
-          ));
-
-          return LayoutBuilder(builder: (context, constraints) {
-            return ConstrainedBox(
-                constraints: BoxConstraints.expand(height: 350.0),
-                child: IntrinsicHeight(
-                    child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                      SizedBox(height: 10),
-                      SizedBox(height: 10),
-                      Text(red,
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold)),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Expanded(
-                          child: Padding(
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                              child: new charts.TimeSeriesChart(
-                                seriesList,
-                                animate: true,
-                                animationDuration: Duration(seconds: 2),
-                                primaryMeasureAxis: new charts.NumericAxisSpec(
-                                    tickFormatterSpec: simpleCurrencyFormatter),
-                                defaultRenderer: new charts.LineRendererConfig(
-                                    includePoints: true),
-                                behaviors: [
-                                  new charts.SeriesLegend(
-                                    position: charts.BehaviorPosition.bottom,
-                                    horizontalFirst: false,
-                                    cellPadding: new EdgeInsets.only(
-                                        right: 4.0, bottom: 4.0),
-                                    showMeasures: true,
-                                  ),
-                                  new charts.ChartTitle('Fecha',
-                                      behaviorPosition:
-                                          charts.BehaviorPosition.bottom,
-                                      titleOutsideJustification: charts
-                                          .OutsideJustification.middleDrawArea),
-                                ],
-                                dateTimeFactory:
-                                    const charts.LocalDateTimeFactory(),
-                              ))),
-                                        SizedBox(height: 10),
-          Text('al ' +form.format(fecha.toDate()),style: TextStyle(color: Colors.grey,fontSize: 18)),
-        SizedBox(height: 10),
-                    ])));
+    me.redescompleto.sort((a, b) => a.toString().compareTo(b.toString()));
+    return DropdownButton(
+        hint: Text("Seleccione Red"),
+        value: red,
+        icon: Icon(Icons.arrow_drop_down),
+        iconSize: 24,
+        elevation: 16,
+        style: TextStyle(color: Colors.black, fontSize: 15),
+        onChanged: (String ge) {
+          setState(() {
+            red = ge;
           });
-        });
+        },
+        items: me.redescompleto.map((String valor) {
+          return DropdownMenuItem<String>(
+            value: valor,
+            child: Text(
+              valor,
+              style: TextStyle(color: Colors.black, fontSize: 12),
+            ),
+          );
+        }).toList());
   }
 
-  Widget circular(context) {
+  Widget circularOperativo(context) {
     List<dynamic> prueba = new List();
     dynamic presupuestoCargado;
     List<LinearSales> data2 = new List();
@@ -259,29 +127,24 @@ class _CovidPageState extends State<CovidPage> {
             return Center(child: new CircularProgressIndicator());
           }
           prueba = data.data
-              .where((f) => f['red'] == red && f['fecha'] == fecha)
+              .where((f) =>
+                  f['red'] == red &&
+                  f['fecha'] == fecha &&
+                  f['tipo'] == 'GASTO OPERATIVO')
               .toList();
           seriesListCircular = new List<charts.Series<LinearSales, String>>();
 
           prueba
               .map((f) => {
-                    presupuestoCargado = f['liberado'],
-                    data2.add(new LinearSales(
-                        'Ejecu',
-                        (f['ejecucion'] / f['liberado']) * 100,
-                        Colors.purple)),
-                    data2.add(new LinearSales(
-                        'Saldo',
-                        (f['saldoLiberado'] / f['liberado']) * 100,
-                        Colors.limeAccent)),
+                    presupuestoCargado = f['pim'],
+                    data2.add(new LinearSales('Ejecu',
+                        (f['ejecucion'] / f['pim']) * 100, Colors.purple)),
                     data2.add(new LinearSales('SolPed',
-                        (f['solped'] / f['liberado']) * 100, Colors.redAccent)),
-                    data2.add(new LinearSales(
-                        'Reser',
-                        (f['reserva'] / f['liberado']) * 100,
-                        Colors.greenAccent)),
+                        (f['solped'] / f['pim']) * 100, Colors.redAccent)),
+                    data2.add(new LinearSales('Reser',
+                        (f['reservas'] / f['pim']) * 100, Colors.greenAccent)),
                     data2.add(new LinearSales('Pedi',
-                        (f['pedido'] / f['liberado']) * 100, Colors.blueAccent))
+                        (f['pedido'] / f['pim']) * 100, Colors.blueAccent))
                   })
               .toList();
 
@@ -295,14 +158,14 @@ class _CovidPageState extends State<CovidPage> {
               labelAccessorFn: (LinearSales row, _) =>
                   '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
           return ConstrainedBox(
-              constraints: BoxConstraints.expand(height: 400.0),
+              constraints: BoxConstraints.expand(height: 300.0),
               child: IntrinsicHeight(
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Center(
-                      child: Text('Presupuesto Cargado',
+                      child: Text('Gasto Operativo',
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold))),
                   Center(
@@ -316,9 +179,102 @@ class _CovidPageState extends State<CovidPage> {
                   SizedBox(height: 10),
                   Expanded(
                       child: Container(
-                          height: 300,
+                          height: 250,
                           child: charts.PieChart(
                             seriesListCircular,
+                            animate: true,
+                            animationDuration: Duration(seconds: 2),
+                            behaviors: [
+                              new charts.DatumLegend(
+                                position: charts.BehaviorPosition.bottom,
+                                cellPadding: EdgeInsets.all(5.0),
+                              )
+                            ],
+                            defaultRenderer: new charts.ArcRendererConfig(
+                                arcWidth: 80,
+                                arcRendererDecorators: [
+                                  new charts.ArcLabelDecorator(
+                                      labelPosition:
+                                          charts.ArcLabelPosition.auto,
+                                      insideLabelStyleSpec:
+                                          new charts.TextStyleSpec(
+                                              fontSize: 11,
+                                              color: charts.Color.fromHex(
+                                                  code: "#000000")))
+                                ]),
+                          )))
+                ],
+              )));
+        });
+  }
+
+  Widget circularCapital(context) {
+    List<dynamic> prueba = new List();
+    dynamic presupuestoCargado;
+    List<LinearSales> data2 = new List();
+    return FutureBuilder(
+        future: datos,
+        builder: (BuildContext context, AsyncSnapshot data) {
+          if (!data.hasData) {
+            return Center(child: new CircularProgressIndicator());
+          }
+          prueba = data.data
+              .where((f) =>
+                  f['red'] == red &&
+                  f['fecha'] == fecha &&
+                  f['tipo'] == 'GASTO CAPITAL')
+              .toList();
+          seriesListCircularSede =
+              new List<charts.Series<LinearSales, String>>();
+
+          prueba
+              .map((f) => {
+                    presupuestoCargado = f['pim'],
+                    data2.add(new LinearSales('Ejecu',
+                        (f['ejecucion'] / f['pim']) * 100, Colors.purple)),
+                    data2.add(new LinearSales('SolPed',
+                        (f['solped'] / f['pim']) * 100, Colors.redAccent)),
+                    data2.add(new LinearSales('Reser',
+                        (f['reservas'] / f['pim']) * 100, Colors.greenAccent)),
+                    data2.add(new LinearSales('Pedi',
+                        (f['pedido'] / f['pim']) * 100, Colors.blueAccent))
+                  })
+              .toList();
+
+          seriesListCircularSede.add(charts.Series<LinearSales, String>(
+              id: 'Sales',
+              domainFn: (LinearSales sales, _) => sales.year,
+              measureFn: (LinearSales sales, _) => sales.sales,
+              colorFn: (LinearSales sales, __) => sales.color,
+              data: data2,
+              // Set a label accessor to control the text of the arc label.
+              labelAccessorFn: (LinearSales row, _) =>
+                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+          return ConstrainedBox(
+              constraints: BoxConstraints.expand(height: 300.0),
+              child: IntrinsicHeight(
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Center(
+                      child: Text('Gasto Capital',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold))),
+                  Center(
+                      child: Text(
+                          me
+                              .formatearNumero(presupuestoCargado)
+                              .output
+                              .withoutFractionDigits,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold))),
+                  SizedBox(height: 10),
+                  Expanded(
+                      child: Container(
+                          height: 250,
+                          child: charts.PieChart(
+                            seriesListCircularSede,
                             animate: true,
                             animationDuration: Duration(seconds: 2),
                             behaviors: [
@@ -354,7 +310,10 @@ class _CovidPageState extends State<CovidPage> {
             return Center(child: new CircularProgressIndicator());
           }
           prueba = data.data
-              .where((f) => f['red'] == red && f['fecha'] == fecha)
+              .where((f) =>
+                  f['red'] == red &&
+                  f['fecha'] == fecha &&
+                  f['tipo'] == 'GASTO OPERATIVO')
               .toList();
 
           return Container(
@@ -382,7 +341,7 @@ class _CovidPageState extends State<CovidPage> {
                             .withoutFractionDigits)),
                         DataCell(Text(me
                                 .formatearNumero(((prueba[0]['ejecucion'] /
-                                        prueba[0]['liberado']) *
+                                        prueba[0]['pim']) *
                                     100))
                                 .output
                                 .compactNonSymbol +
@@ -395,9 +354,9 @@ class _CovidPageState extends State<CovidPage> {
                             .output
                             .withoutFractionDigits)),
                         DataCell(Text(me
-                                .formatearNumero(((prueba[0]['solped'] /
-                                        prueba[0]['liberado']) *
-                                    100))
+                                .formatearNumero(
+                                    ((prueba[0]['solped'] / prueba[0]['pim']) *
+                                        100))
                                 .output
                                 .compactNonSymbol +
                             '%')),
@@ -409,9 +368,9 @@ class _CovidPageState extends State<CovidPage> {
                             .output
                             .withoutFractionDigits)),
                         DataCell(Text(me
-                                .formatearNumero(((prueba[0]['pedido'] /
-                                        prueba[0]['liberado']) *
-                                    100))
+                                .formatearNumero(
+                                    ((prueba[0]['pedido'] / prueba[0]['pim']) *
+                                        100))
                                 .output
                                 .compactNonSymbol +
                             '%'))
@@ -419,31 +378,17 @@ class _CovidPageState extends State<CovidPage> {
                       DataRow(cells: [
                         DataCell(Text('Reservas')),
                         DataCell(Text(me
-                            .formatearNumero((prueba[0]['reserva']))
+                            .formatearNumero((prueba[0]['reservas']))
                             .output
                             .withoutFractionDigits)),
                         DataCell(Text(me
-                                .formatearNumero(((prueba[0]['reserva'] /
-                                        prueba[0]['liberado']) *
+                                .formatearNumero(((prueba[0]['reservas'] /
+                                        prueba[0]['pim']) *
                                     100))
                                 .output
                                 .compactNonSymbol +
                             '%'))
-                      ]),
-                      DataRow(cells: [
-                        DataCell(Text('Saldo')),
-                        DataCell(Text(me
-                            .formatearNumero((prueba[0]['saldoLiberado']))
-                            .output
-                            .withoutFractionDigits)),
-                        DataCell(Text(me
-                                .formatearNumero(((prueba[0]['saldoLiberado'] /
-                                        prueba[0]['liberado']) *
-                                    100))
-                                .output
-                                .compactNonSymbol +
-                            '%'))
-                      ]),
+                      ])
                     ],
                     sortColumnIndex: 2,
                     sortAscending: false,
@@ -451,7 +396,102 @@ class _CovidPageState extends State<CovidPage> {
         });
   }
 
-  Widget circularSede(context) {
+  Widget detalleCapital(context) {
+    List<dynamic> prueba = new List();
+    return FutureBuilder(
+        future: datos,
+        builder: (BuildContext context, AsyncSnapshot data) {
+          if (!data.hasData) {
+            return Center(child: new CircularProgressIndicator());
+          }
+          prueba = data.data
+              .where((f) =>
+                  f['red'] == red &&
+                  f['fecha'] == fecha &&
+                  f['tipo'] == 'GASTO CAPITAL')
+              .toList();
+
+          return Container(
+              color: Colors.white,
+              child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columns: [
+                      DataColumn(
+                          label: Text("Compromiso",
+                              style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(
+                          label: Text("Monto",
+                              style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(
+                          label: Text("%",
+                              style: TextStyle(fontWeight: FontWeight.bold))),
+                    ],
+                    rows: [
+                      DataRow(cells: [
+                        DataCell(Text('Ejecucion')),
+                        DataCell(Text(me
+                            .formatearNumero((prueba[0]['ejecucion']))
+                            .output
+                            .withoutFractionDigits)),
+                        DataCell(Text(me
+                                .formatearNumero(((prueba[0]['ejecucion'] /
+                                        prueba[0]['pim']) *
+                                    100))
+                                .output
+                                .compactNonSymbol +
+                            '%')),
+                      ]),
+                      DataRow(cells: [
+                        DataCell(Text('SolPed')),
+                        DataCell(Text(me
+                            .formatearNumero((prueba[0]['solped']))
+                            .output
+                            .withoutFractionDigits)),
+                        DataCell(Text(me
+                                .formatearNumero(
+                                    ((prueba[0]['solped'] / prueba[0]['pim']) *
+                                        100))
+                                .output
+                                .compactNonSymbol +
+                            '%')),
+                      ]),
+                      DataRow(cells: [
+                        DataCell(Text('Pedidos')),
+                        DataCell(Text(me
+                            .formatearNumero((prueba[0]['pedido']))
+                            .output
+                            .withoutFractionDigits)),
+                        DataCell(Text(me
+                                .formatearNumero(
+                                    ((prueba[0]['pedido'] / prueba[0]['pim']) *
+                                        100))
+                                .output
+                                .compactNonSymbol +
+                            '%'))
+                      ]),
+                      DataRow(cells: [
+                        DataCell(Text('Reservas')),
+                        DataCell(Text(me
+                            .formatearNumero((prueba[0]['reservas']))
+                            .output
+                            .withoutFractionDigits)),
+                        DataCell(Text(me
+                                .formatearNumero(((prueba[0]['reservas'] /
+                                        prueba[0]['pim']) *
+                                    100))
+                                .output
+                                .compactNonSymbol +
+                            '%'))
+                      ])
+                    ],
+                    sortColumnIndex: 2,
+                    sortAscending: false,
+                  )));
+        });
+  }
+
+  /* Widget circularSede(context) {
     if(red=='SEDE CENTRAL'){
     List<dynamic> prueba = new List();
     List<LinearSales> data2 = new List();
@@ -596,8 +636,7 @@ class _CovidPageState extends State<CovidPage> {
     return SizedBox(height: 1);
 
   }
-
-   
+*/
 
   @override
   void dispose() {
@@ -626,17 +665,25 @@ class LinearSales {
   final double sales;
   final charts.Color color;
 
-  LinearSales(this.year, this.sales, Color color,)
-      : this.color = new charts.Color(
+  LinearSales(
+    this.year,
+    this.sales,
+    Color color,
+  ) : this.color = new charts.Color(
             r: color.red, g: color.green, b: color.blue, a: color.alpha);
 }
+
 class LinearSalesRubro {
   final String year;
   final double sales;
   final String rubro;
   final charts.Color color;
-  
-  LinearSalesRubro(this.year, this.sales,this.rubro, Color color,)
-      : this.color = new charts.Color(
+
+  LinearSalesRubro(
+    this.year,
+    this.sales,
+    this.rubro,
+    Color color,
+  ) : this.color = new charts.Color(
             r: color.red, g: color.green, b: color.blue, a: color.alpha);
 }
