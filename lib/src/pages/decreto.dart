@@ -128,7 +128,7 @@ class _DecretoPageState extends State<DecretoPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
           return ConstrainedBox(
               constraints: BoxConstraints.expand(height: 300.0),
               child: IntrinsicHeight(
@@ -217,7 +217,7 @@ class _DecretoPageState extends State<DecretoPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
           return ConstrainedBox(
               constraints: BoxConstraints.expand(height: 200.0),
               child: IntrinsicHeight(
@@ -308,7 +308,7 @@ class _DecretoPageState extends State<DecretoPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
           return ConstrainedBox(
               constraints: BoxConstraints.expand(height: 200.0),
               child: IntrinsicHeight(
@@ -397,7 +397,7 @@ class _DecretoPageState extends State<DecretoPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
           return ConstrainedBox(
               constraints: BoxConstraints.expand(height: 200.0),
               child: IntrinsicHeight(
@@ -488,7 +488,7 @@ class _DecretoPageState extends State<DecretoPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
           return ConstrainedBox(
               constraints: BoxConstraints.expand(height: 200.0),
               child: IntrinsicHeight(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gcpp_essalud/src/pages/bono.dart';
 import 'package:gcpp_essalud/src/pages/covid.dart';
 import 'package:gcpp_essalud/src/pages/covidTransferencia.dart';
 import 'package:gcpp_essalud/src/pages/decreto.dart';
@@ -21,18 +22,20 @@ class _RecursosPropiosPageState extends State<RecursosPropiosPage> {
               padding: const EdgeInsets.all(8.0),
               child: GestureDetector(
                 onTap: () {
-                                Navigator.push(
+                  Navigator.push(
                       context,
                       MaterialPageRoute<Null>(
                         builder: (BuildContext context) {
-                          return DecretoPage(decreto: 'Covid-DS10',);
+                          return DecretoPage(
+                            decreto: 'Covid-DS10',
+                          );
                         },
                         fullscreenDialog: true,
                       ));
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.cyan,
+                    color: Colors.blue,
                     border: Border.all(color: Colors.black, width: 1),
                     borderRadius: BorderRadius.all(Radius.circular(18)),
                   ),
@@ -54,21 +57,21 @@ class _RecursosPropiosPageState extends State<RecursosPropiosPage> {
                       context,
                       MaterialPageRoute<Null>(
                         builder: (BuildContext context) {
-                          return DecretoPage(decreto: 'Covid-DS11',);
+                          return DecretoPage(
+                            decreto: 'Covid-DS11',
+                          );
                         },
                         fullscreenDialog: true,
                       ));
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    
-                    color: Colors.cyan,
+                    color: Colors.blue,
                     border: Border.all(color: Colors.black, width: 1),
                     borderRadius: BorderRadius.all(Radius.circular(18)),
                   ),
                   width: MediaQuery.of(context).size.width / 2.5,
                   height: 100,
-                  
                   child: Center(
                       child: Text('Decreto Supremo Nº 11-2020-SA',
                           textAlign: TextAlign.center,
@@ -92,7 +95,7 @@ class _RecursosPropiosPageState extends State<RecursosPropiosPage> {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.cyan,
+                    color: Colors.blue,
                     border: Border.all(color: Colors.black, width: 1),
                     borderRadius: BorderRadius.all(Radius.circular(18)),
                   ),
@@ -109,10 +112,19 @@ class _RecursosPropiosPageState extends State<RecursosPropiosPage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute<Null>(
+                        builder: (BuildContext context) {
+                          return BonoPage();
+                        },
+                        fullscreenDialog: true,
+                      ));
+                },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.cyan,
+                    color: Colors.blue,
                     border: Border.all(color: Colors.black, width: 1),
                     borderRadius: BorderRadius.all(Radius.circular(18)),
                   ),
@@ -132,7 +144,7 @@ class _RecursosPropiosPageState extends State<RecursosPropiosPage> {
                 onTap: () {},
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.cyan,
+                    color: Colors.blue,
                     border: Border.all(color: Colors.black, width: 1),
                     borderRadius: BorderRadius.all(Radius.circular(18)),
                   ),

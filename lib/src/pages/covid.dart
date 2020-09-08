@@ -159,7 +159,7 @@ class _CovidPageState extends State<CovidPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
           return ConstrainedBox(
               constraints: BoxConstraints.expand(height: 300.0),
               child: IntrinsicHeight(
@@ -252,7 +252,7 @@ class _CovidPageState extends State<CovidPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
           return ConstrainedBox(
               constraints: BoxConstraints.expand(height: 300.0),
               child: IntrinsicHeight(
@@ -493,153 +493,6 @@ class _CovidPageState extends State<CovidPage> {
                   )));
         });
   }
-
-  /* Widget circularSede(context) {
-    if(red=='SEDE CENTRAL'){
-    List<dynamic> prueba = new List();
-    List<LinearSales> data2 = new List();
-    return ConstrainedBox(
-        constraints: BoxConstraints.expand(height: 500.0),
-        child: IntrinsicHeight(
-            child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Center(
-                child: Text('Gerencias Sede Central',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
-            SizedBox(height: 10),
-            Expanded(
-                child: Container(
-                    height: 250,
-                    child: FutureBuilder(
-                      future: datosSede,
-                      builder: (BuildContext context, AsyncSnapshot data) {
-                        if (!data.hasData) {
-                          return Text('Cargando Informacion');
-                        } else if (data.connectionState !=
-                            ConnectionState.waiting) {
-                          prueba = data.data
-                              .where((f) => f['fecha'] == fecha)
-                              .toList();
-                          seriesListCircularSede =
-                              new List<charts.Series<LinearSales, String>>();
-                          prueba
-                              .map((f) => {
-                                    if (f['gerencia'] == 'GOF')
-                                      {
-                                        data2.add(new LinearSales(
-                                            f['gerencia'],
-                                            (f['monto'] / f['cargado']) * 100,
-                                            Colors.purple))
-                                      }
-                                    else if (f['gerencia'] == 'CEABE')
-                                      {
-                                        data2.add(new LinearSales(
-                                            f['gerencia'],
-                                            (f['monto'] / f['cargado']) * 100,
-                                            Colors.blueAccent))
-                                      }
-                                    else
-                                      {
-                                        data2.add(new LinearSales(
-                                            f['gerencia'],
-                                            (f['monto'] / f['cargado']) * 100,
-                                            Colors.redAccent))
-                                      }
-                                  })
-                              .toList();
-                          seriesListCircularSede.add(charts.Series<LinearSales,
-                                  String>(
-                              id: 'Sales',
-                              domainFn: (LinearSales sales, _) => sales.year,
-                              measureFn: (LinearSales sales, _) => sales.sales,
-                              colorFn: (LinearSales sales, __) => sales.color,
-                              data: data2,
-                              // Set a label accessor to control the text of the arc label.
-                              labelAccessorFn: (LinearSales row, _) =>
-                                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
-
-                          return 
-                          charts.PieChart(
-                            seriesListCircularSede,
-                            animate: true,
-                            animationDuration: Duration(seconds: 2),
-                            behaviors: [
-                              new charts.DatumLegend(
-                                position: charts.BehaviorPosition.end,
-                              )
-                            ],
-                            defaultRenderer: new charts.ArcRendererConfig(
-                                arcWidth: 80,
-                                arcRendererDecorators: [
-                                  new charts.ArcLabelDecorator(
-                                      labelPosition:
-                                          charts.ArcLabelPosition.auto,
-                                      insideLabelStyleSpec:
-                                          new charts.TextStyleSpec(
-                                              fontSize: 11,
-                                              color: charts.Color.fromHex(
-                                                  code: "#000000")))
-                                ]),
-                          );
-                        }
-                        return SizedBox(height: 1);
-                      },
-                    ))),
-            FutureBuilder(
-              future: datosSede,
-                      builder: (BuildContext context, AsyncSnapshot data) {
-                        if (!data.hasData) {
-                          return Text('Cargando Informacion');
-                        } else if (data.connectionState !=ConnectionState.waiting) {
-                          prueba = data.data
-                              .where((f) => f['fecha'] == fecha)
-                              .toList();
-            return Container(
-                color: Colors.white,
-                    child: DataTable(
-                      columns: [
-                        DataColumn(
-                            label: Text("Gerencia",
-                                style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(
-                            label: Text("Monto",
-                                style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(
-                            label: Text("%",
-                                style: TextStyle(fontWeight: FontWeight.bold))),
-                      ],
-                      rows: prueba.map((f) {
-                  return DataRow(cells: [
-                    DataCell(Text(f['gerencia'])),
-                    DataCell(Text(me
-                        .formatearNumero(double.parse(f['monto'].toString()))
-                        .output
-                        .withoutFractionDigits
-                        .toString())),
-                    DataCell(Text(me
-                        .formatearNumero(double.parse(f['monto'].toString())/double.parse(f['cargado'].toString())* 100)
-                        .output
-                        .compactNonSymbol
-                        .toString()+'%')),
-                  ]);
-                }).toList(),
-                      sortColumnIndex: 0,
-                      sortAscending: true,
-                    ));
-                    }
-                    return SizedBox(height: 1);
-                    }
-                    )
-                    
-          ],
-        )));
-    }
-    return SizedBox(height: 1);
-
-  }
-*/
 
   @override
   void dispose() {
