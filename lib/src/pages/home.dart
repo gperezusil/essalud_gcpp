@@ -84,14 +84,6 @@ class _HomeState extends State<HomePage> {
         MenuCovidPage()));
     items.add(new ScreenHiddenDrawer(
         new ItemHiddenMenu(
-          name: 'Villa Panamericana',
-          baseStyle:
-              TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 16.0),
-          colorLineSelected: Colors.teal,
-        ),
-        VillaPanamericanaPage()));
-    items.add(new ScreenHiddenDrawer(
-        new ItemHiddenMenu(
           name: 'Configuracion',
           baseStyle:
               TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 16.0),

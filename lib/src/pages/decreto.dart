@@ -11,11 +11,12 @@ class DecretoPage extends StatefulWidget {
   final String decreto;
   const DecretoPage({Key key, this.decreto}) : super(key: key);
 
-    static Route<dynamic> route(d) {
+  static Route<dynamic> route(d) {
     return MaterialPageRoute(
       builder: (context) => DecretoPage(decreto: d),
     );
   }
+
   @override
   _DecretoPageState createState() => _DecretoPageState();
 }
@@ -25,6 +26,9 @@ class _DecretoPageState extends State<DecretoPage> {
   StreamSubscription<QuerySnapshot> noteSubFecha;
   List<charts.Series<LinearSales, String>> seriesTotal;
   List<charts.Series<LinearSales, String>> seriesEquipamiento;
+  List<charts.Series<LinearSales, String>> seriesInsumos;
+  List<charts.Series<LinearSales, String>> seriesServicios;
+  List<charts.Series<LinearSales, String>> seriesMedicinas;
   Metodos me = new Metodos();
   Timestamp fecha;
   CloudService cloud = new CloudService();
@@ -32,22 +36,29 @@ class _DecretoPageState extends State<DecretoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.decreto)),
-      body: SingleChildScrollView(
+        appBar: AppBar(title: Text(widget.decreto)),
+        body: SingleChildScrollView(
             child: Column(
           children: <Widget>[
             SizedBox(height: 10),
-      circularOperativo(context),
-      SizedBox(height: 10),
-      detalle(context),
-      SizedBox(height: 20),
-      circularEquipamiento(context)
+            circularOperativo(context),
+            SizedBox(height: 10),
+            detalle(context),
+            SizedBox(height: 20),
+            circularEquipamiento(context),
+            SizedBox(height: 20),
+            circularInsumos(context),
+            SizedBox(height: 20),
+            circularMedicinas(context),
+            SizedBox(height: 20),
+            circularServicios(context),
+            SizedBox(height: 20),
           ],
-        ))
-    );
+        )));
   }
+
   @override
-  void initState() { 
+  void initState() {
     super.initState();
     listarFecha();
     listar();
@@ -56,7 +67,8 @@ class _DecretoPageState extends State<DecretoPage> {
   listar() async {
     noteSub?.cancel();
     List<dynamic> aux = new List();
-    noteSub = cloud.listarDatos(widget.decreto).listen((QuerySnapshot snapshot) {
+    noteSub =
+        cloud.listarDatos(widget.decreto).listen((QuerySnapshot snapshot) {
       snapshot.documents.map((f) {
         aux.add(f);
       }).toList();
@@ -66,7 +78,7 @@ class _DecretoPageState extends State<DecretoPage> {
     });
   }
 
-    listarFecha() async {
+  listarFecha() async {
     noteSubFecha?.cancel();
     noteSubFecha = cloud
         .listarDatos('Configuracion-fecha')
@@ -79,7 +91,7 @@ class _DecretoPageState extends State<DecretoPage> {
     });
   }
 
-    Widget circularOperativo(context) {
+  Widget circularOperativo(context) {
     List<dynamic> prueba = new List();
     dynamic presupuestoCargado;
     List<LinearSales> data2 = new List();
@@ -90,9 +102,7 @@ class _DecretoPageState extends State<DecretoPage> {
             return Center(child: new CircularProgressIndicator());
           }
           prueba = data.data
-              .where((f) =>
-                  f['red'] == 'TOTAL' &&
-                  f['fecha'] == fecha )
+              .where((f) => f['red'] == 'TOTAL' && f['fecha'] == fecha)
               .toList();
           seriesTotal = new List<charts.Series<LinearSales, String>>();
 
@@ -170,7 +180,7 @@ class _DecretoPageState extends State<DecretoPage> {
         });
   }
 
-    Widget circularEquipamiento(context) {
+  Widget circularEquipamiento(context) {
     List<dynamic> prueba = new List();
     dynamic presupuestoCargado;
     List<LinearSales> data2 = new List();
@@ -181,9 +191,7 @@ class _DecretoPageState extends State<DecretoPage> {
             return Center(child: new CircularProgressIndicator());
           }
           prueba = data.data
-              .where((f) =>
-                  f['red'] == 'EQUIPAMIENTO' &&
-                  f['fecha'] == fecha )
+              .where((f) => f['red'] == 'EQUIPAMIENTO' && f['fecha'] == fecha)
               .toList();
           seriesEquipamiento = new List<charts.Series<LinearSales, String>>();
 
@@ -260,8 +268,11 @@ class _DecretoPageState extends State<DecretoPage> {
               )));
         });
   }
-    Widget detalle(context) {
+
+  Widget circularInsumos(context) {
     List<dynamic> prueba = new List();
+    dynamic presupuestoCargado;
+    List<LinearSales> data2 = new List();
     return FutureBuilder(
         future: datos,
         builder: (BuildContext context, AsyncSnapshot data) {
@@ -270,8 +281,275 @@ class _DecretoPageState extends State<DecretoPage> {
           }
           prueba = data.data
               .where((f) =>
-                  f['red'] == 'TOTAL' &&
-                  f['fecha'] == fecha )
+                  f['red'] == 'INSUMOS Y MATERIAL MEDICO' &&
+                  f['fecha'] == fecha)
+              .toList();
+          seriesInsumos = new List<charts.Series<LinearSales, String>>();
+
+          prueba
+              .map((f) => {
+                    presupuestoCargado = f['pim'],
+                    data2.add(new LinearSales('Ejecu',
+                        (f['ejecucion'] / f['pim']) * 100, Colors.purple)),
+                    data2.add(new LinearSales('SolPed',
+                        (f['solped'] / f['pim']) * 100, Colors.redAccent)),
+                    data2.add(new LinearSales('Reser',
+                        (f['reservas'] / f['pim']) * 100, Colors.greenAccent)),
+                    data2.add(new LinearSales('Pedi',
+                        (f['pedido'] / f['pim']) * 100, Colors.blueAccent))
+                  })
+              .toList();
+
+          seriesInsumos.add(charts.Series<LinearSales, String>(
+              id: 'Sales',
+              domainFn: (LinearSales sales, _) => sales.year,
+              measureFn: (LinearSales sales, _) => sales.sales,
+              colorFn: (LinearSales sales, __) => sales.color,
+              data: data2,
+              // Set a label accessor to control the text of the arc label.
+              labelAccessorFn: (LinearSales row, _) =>
+                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+          return ConstrainedBox(
+              constraints: BoxConstraints.expand(height: 200.0),
+              child: IntrinsicHeight(
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Center(
+                      child: Text('INSUMOS Y MATERIAL MEDICO',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold))),
+                  Center(
+                      child: Text(
+                          me
+                              .formatearNumero(presupuestoCargado)
+                              .output
+                              .withoutFractionDigits,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold))),
+                  SizedBox(height: 10),
+                  Expanded(
+                      child: Container(
+                          height: 150,
+                          child: charts.PieChart(
+                            seriesInsumos,
+                            animate: true,
+                            animationDuration: Duration(seconds: 2),
+                            behaviors: [
+                              new charts.DatumLegend(
+                                position: charts.BehaviorPosition.end,
+                                cellPadding: EdgeInsets.all(5.0),
+                              )
+                            ],
+                            defaultRenderer: new charts.ArcRendererConfig(
+                                arcWidth: 80,
+                                arcRendererDecorators: [
+                                  new charts.ArcLabelDecorator(
+                                      labelPosition:
+                                          charts.ArcLabelPosition.auto,
+                                      insideLabelStyleSpec:
+                                          new charts.TextStyleSpec(
+                                              fontSize: 11,
+                                              color: charts.Color.fromHex(
+                                                  code: "#000000")))
+                                ]),
+                          )))
+                ],
+              )));
+        });
+  }
+
+  Widget circularMedicinas(context) {
+    List<dynamic> prueba = new List();
+    dynamic presupuestoCargado;
+    List<LinearSales> data2 = new List();
+    return FutureBuilder(
+        future: datos,
+        builder: (BuildContext context, AsyncSnapshot data) {
+          if (!data.hasData) {
+            return Center(child: new CircularProgressIndicator());
+          }
+          prueba = data.data
+              .where((f) => f['red'] == 'MEDICINAS' && f['fecha'] == fecha)
+              .toList();
+          seriesMedicinas = new List<charts.Series<LinearSales, String>>();
+
+          prueba
+              .map((f) => {
+                    presupuestoCargado = f['pim'],
+                    data2.add(new LinearSales('Ejecu',
+                        (f['ejecucion'] / f['pim']) * 100, Colors.purple)),
+                    data2.add(new LinearSales('SolPed',
+                        (f['solped'] / f['pim']) * 100, Colors.redAccent)),
+                    data2.add(new LinearSales('Reser',
+                        (f['reservas'] / f['pim']) * 100, Colors.greenAccent)),
+                    data2.add(new LinearSales('Pedi',
+                        (f['pedido'] / f['pim']) * 100, Colors.blueAccent))
+                  })
+              .toList();
+
+          seriesMedicinas.add(charts.Series<LinearSales, String>(
+              id: 'Sales',
+              domainFn: (LinearSales sales, _) => sales.year,
+              measureFn: (LinearSales sales, _) => sales.sales,
+              colorFn: (LinearSales sales, __) => sales.color,
+              data: data2,
+              // Set a label accessor to control the text of the arc label.
+              labelAccessorFn: (LinearSales row, _) =>
+                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+          return ConstrainedBox(
+              constraints: BoxConstraints.expand(height: 200.0),
+              child: IntrinsicHeight(
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Center(
+                      child: Text('MEDICINAS',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold))),
+                  Center(
+                      child: Text(
+                          me
+                              .formatearNumero(presupuestoCargado)
+                              .output
+                              .withoutFractionDigits,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold))),
+                  SizedBox(height: 10),
+                  Expanded(
+                      child: Container(
+                          height: 150,
+                          child: charts.PieChart(
+                            seriesMedicinas,
+                            animate: true,
+                            animationDuration: Duration(seconds: 2),
+                            behaviors: [
+                              new charts.DatumLegend(
+                                position: charts.BehaviorPosition.end,
+                                cellPadding: EdgeInsets.all(5.0),
+                              )
+                            ],
+                            defaultRenderer: new charts.ArcRendererConfig(
+                                arcWidth: 80,
+                                arcRendererDecorators: [
+                                  new charts.ArcLabelDecorator(
+                                      labelPosition:
+                                          charts.ArcLabelPosition.auto,
+                                      insideLabelStyleSpec:
+                                          new charts.TextStyleSpec(
+                                              fontSize: 11,
+                                              color: charts.Color.fromHex(
+                                                  code: "#000000")))
+                                ]),
+                          )))
+                ],
+              )));
+        });
+  }
+
+  Widget circularServicios(context) {
+    List<dynamic> prueba = new List();
+    dynamic presupuestoCargado;
+    List<LinearSales> data2 = new List();
+    return FutureBuilder(
+        future: datos,
+        builder: (BuildContext context, AsyncSnapshot data) {
+          if (!data.hasData) {
+            return Center(child: new CircularProgressIndicator());
+          }
+          prueba = data.data
+              .where((f) =>
+                  f['red'] == 'SERVICIOS COMPLEMENTARIOS' &&
+                  f['fecha'] == fecha)
+              .toList();
+          seriesServicios = new List<charts.Series<LinearSales, String>>();
+
+          prueba
+              .map((f) => {
+                    presupuestoCargado = f['pim'],
+                    data2.add(new LinearSales('Ejecu',
+                        (f['ejecucion'] / f['pim']) * 100, Colors.purple)),
+                    data2.add(new LinearSales('SolPed',
+                        (f['solped'] / f['pim']) * 100, Colors.redAccent)),
+                    data2.add(new LinearSales('Reser',
+                        (f['reservas'] / f['pim']) * 100, Colors.greenAccent)),
+                    data2.add(new LinearSales('Pedi',
+                        (f['pedido'] / f['pim']) * 100, Colors.blueAccent))
+                  })
+              .toList();
+
+          seriesServicios.add(charts.Series<LinearSales, String>(
+              id: 'Sales',
+              domainFn: (LinearSales sales, _) => sales.year,
+              measureFn: (LinearSales sales, _) => sales.sales,
+              colorFn: (LinearSales sales, __) => sales.color,
+              data: data2,
+              // Set a label accessor to control the text of the arc label.
+              labelAccessorFn: (LinearSales row, _) =>
+                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+          return ConstrainedBox(
+              constraints: BoxConstraints.expand(height: 200.0),
+              child: IntrinsicHeight(
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Center(
+                      child: Text('SERVICIOS COMPLEMENTARIOS',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold))),
+                  Center(
+                      child: Text(
+                          me
+                              .formatearNumero(presupuestoCargado)
+                              .output
+                              .withoutFractionDigits,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold))),
+                  SizedBox(height: 10),
+                  Expanded(
+                      child: Container(
+                          height: 150,
+                          child: charts.PieChart(
+                            seriesServicios,
+                            animate: true,
+                            animationDuration: Duration(seconds: 2),
+                            behaviors: [
+                              new charts.DatumLegend(
+                                position: charts.BehaviorPosition.end,
+                                cellPadding: EdgeInsets.all(5.0),
+                              )
+                            ],
+                            defaultRenderer: new charts.ArcRendererConfig(
+                                arcWidth: 80,
+                                arcRendererDecorators: [
+                                  new charts.ArcLabelDecorator(
+                                      labelPosition:
+                                          charts.ArcLabelPosition.auto,
+                                      insideLabelStyleSpec:
+                                          new charts.TextStyleSpec(
+                                              fontSize: 11,
+                                              color: charts.Color.fromHex(
+                                                  code: "#000000")))
+                                ]),
+                          )))
+                ],
+              )));
+        });
+  }
+
+  Widget detalle(context) {
+    List<dynamic> prueba = new List();
+    return FutureBuilder(
+        future: datos,
+        builder: (BuildContext context, AsyncSnapshot data) {
+          if (!data.hasData) {
+            return Center(child: new CircularProgressIndicator());
+          }
+          prueba = data.data
+              .where((f) => f['red'] == 'TOTAL' && f['fecha'] == fecha)
               .toList();
 
           return Container(
@@ -353,5 +631,4 @@ class _DecretoPageState extends State<DecretoPage> {
                   )));
         });
   }
-  
 }
