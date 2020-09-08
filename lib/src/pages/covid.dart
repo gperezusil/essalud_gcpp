@@ -41,27 +41,30 @@ class _CovidPageState extends State<CovidPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          title: Text('Covid Redes'),
+        ),
         body: SingleChildScrollView(
             child: Column(
-      children: <Widget>[
-        _builCombo(context),
-        SizedBox(height: 10),
-        Center(
-            child: Text(
-          red,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        )),
-        SizedBox(height: 20),
-        circularOperativo(context),
-        SizedBox(height: 20),
-        detalle(context),
-        SizedBox(height: 20),
-        circularCapital(context),
-        SizedBox(height: 20),
-        detalleCapital(context),
-      ],
-    )));
+          children: <Widget>[
+            _builCombo(context),
+            SizedBox(height: 10),
+            Center(
+                child: Text(
+              red,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            )),
+            SizedBox(height: 20),
+            circularOperativo(context),
+            SizedBox(height: 20),
+            detalle(context),
+            SizedBox(height: 20),
+            circularCapital(context),
+            SizedBox(height: 20),
+            detalleCapital(context),
+          ],
+        )));
   }
 
   listarFecha() async {

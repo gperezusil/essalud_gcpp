@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gcpp_essalud/src/pages/covid.dart';
+import 'package:gcpp_essalud/src/pages/covidPropios.dart';
+import 'package:gcpp_essalud/src/pages/covidTransferencia.dart';
 
 class MenuCovidPage extends StatefulWidget {
   @override
@@ -14,21 +17,45 @@ class _MenuCovidPageState extends State<MenuCovidPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            new RaisedButton(
-              textColor: Theme.of(context).accentColor,
-              color: Colors.red,
+            RaisedButton(
+              color: Colors.blue,
               padding: const EdgeInsets.all(8.0),
               child: new Text(
-                "Subtract",
+                "Recursos Propios COVID",
               ),
+              elevation: 10.0,
+              shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(10.0)),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute<Null>(
+                      builder: (BuildContext context) {
+                        return RecursosPropiosPage();
+                      },
+                      fullscreenDialog: true,
+                    ));
+              },
             ),
-            new RaisedButton(
-              textColor: Theme.of(context).accentColor,
-              color: Colors.red,
+            RaisedButton(
+              elevation: 10.0,
+              shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(10.0)),
+              color: Colors.greenAccent,
               padding: const EdgeInsets.all(8.0),
               child: new Text(
-                "Subtract",
+                "Transferencias COVID",
               ),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute<Null>(
+                      builder: (BuildContext context) {
+                        return CovidTransferenciaPage();
+                      },
+                      fullscreenDialog: true,
+                    ));
+              },
             ),
           ],
         ),
