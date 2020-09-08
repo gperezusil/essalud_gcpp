@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/pages/covid.dart';
+import 'package:gcpp_essalud/src/pages/covidTransferencia.dart';
+import 'package:gcpp_essalud/src/pages/decreto.dart';
 
 class RecursosPropiosPage extends StatefulWidget {
   @override
@@ -12,74 +14,138 @@ class _RecursosPropiosPageState extends State<RecursosPropiosPage> {
     return Scaffold(
       appBar: AppBar(title: Text('Recursos Propios COVID')),
       body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Wrap(
+          direction: Axis.horizontal,
           children: [
-            RaisedButton(
-              color: Colors.blue,
+            Padding(
               padding: const EdgeInsets.all(8.0),
-              child: new Text(
-                "Decreto Supremo 10",
+              child: GestureDetector(
+                onTap: () {
+                                Navigator.push(
+                      context,
+                      MaterialPageRoute<Null>(
+                        builder: (BuildContext context) {
+                          return DecretoPage(decreto: 'Covid-DS10',);
+                        },
+                        fullscreenDialog: true,
+                      ));
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.cyan,
+                    border: Border.all(color: Colors.black, width: 1),
+                    borderRadius: BorderRadius.all(Radius.circular(18)),
+                  ),
+                  width: MediaQuery.of(context).size.width / 2.5,
+                  height: 100,
+                  child: Center(
+                      child: Text('Decreto Supremo Nº 10-2020-SA',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 14, color: Colors.white))),
+                  padding: EdgeInsets.all(10),
+                ),
               ),
-              elevation: 10.0,
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(10.0)),
-              onPressed: () {},
             ),
-            RaisedButton(
-              elevation: 10.0,
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(10.0)),
-              color: Colors.greenAccent,
+            Padding(
               padding: const EdgeInsets.all(8.0),
-              child: new Text(
-                "Decreto Supremo 11",
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute<Null>(
+                        builder: (BuildContext context) {
+                          return DecretoPage(decreto: 'Covid-DS11',);
+                        },
+                        fullscreenDialog: true,
+                      ));
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    
+                    color: Colors.cyan,
+                    border: Border.all(color: Colors.black, width: 1),
+                    borderRadius: BorderRadius.all(Radius.circular(18)),
+                  ),
+                  width: MediaQuery.of(context).size.width / 2.5,
+                  height: 100,
+                  
+                  child: Center(
+                      child: Text('Decreto Supremo Nº 11-2020-SA',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 14, color: Colors.white))),
+                  padding: EdgeInsets.all(10),
+                ),
               ),
-              onPressed: () {},
             ),
-            RaisedButton(
-              elevation: 10.0,
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(10.0)),
-              color: Colors.purple,
+            Padding(
               padding: const EdgeInsets.all(8.0),
-              child: new Text(
-                "Covid Redes",
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute<Null>(
+                        builder: (BuildContext context) {
+                          return CovidPage();
+                        },
+                        fullscreenDialog: true,
+                      ));
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.cyan,
+                    border: Border.all(color: Colors.black, width: 1),
+                    borderRadius: BorderRadius.all(Radius.circular(18)),
+                  ),
+                  width: MediaQuery.of(context).size.width / 2.5,
+                  height: 100,
+                  child: Center(
+                      child: Text('Covid Redes',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 14, color: Colors.white))),
+                  padding: EdgeInsets.all(10),
+                ),
               ),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute<Null>(
-                      builder: (BuildContext context) {
-                        return CovidPage();
-                      },
-                      fullscreenDialog: true,
-                    ));
-              },
             ),
-            RaisedButton(
-              elevation: 10.0,
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(10.0)),
-              color: Colors.cyan,
+            Padding(
               padding: const EdgeInsets.all(8.0),
-              child: new Text(
-                "DU 26 (Bono)",
+              child: GestureDetector(
+                onTap: () {},
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.cyan,
+                    border: Border.all(color: Colors.black, width: 1),
+                    borderRadius: BorderRadius.all(Radius.circular(18)),
+                  ),
+                  width: MediaQuery.of(context).size.width / 2.5,
+                  height: 100,
+                  child: Center(
+                      child: Text('DU Nº 026-2020 (Bonos)',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 14, color: Colors.white))),
+                  padding: EdgeInsets.all(10),
+                ),
               ),
-              onPressed: () {},
             ),
-            RaisedButton(
-              elevation: 10.0,
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(10.0)),
-              color: Colors.amberAccent,
+            Padding(
               padding: const EdgeInsets.all(8.0),
-              child: new Text(
-                "Covid Sede",
+              child: GestureDetector(
+                onTap: () {},
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.cyan,
+                    border: Border.all(color: Colors.black, width: 1),
+                    borderRadius: BorderRadius.all(Radius.circular(18)),
+                  ),
+                  width: MediaQuery.of(context).size.width / 2.5,
+                  height: 100,
+                  child: Center(
+                      child: Text('Covid Sede',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 14, color: Colors.white))),
+                  padding: EdgeInsets.all(10),
+                ),
               ),
-              onPressed: () {},
-            ),
+            )
           ],
         ),
       ),

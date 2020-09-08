@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gcpp_essalud/src/pages/covid.dart';
-import 'package:gcpp_essalud/src/pages/home.dart';
 import 'package:gcpp_essalud/src/preferencias_usuario/preferencias_usuario.dart';
 import 'package:gcpp_essalud/src/screen/changePass.dart';
 import 'package:gcpp_essalud/src/screen/login.dart';

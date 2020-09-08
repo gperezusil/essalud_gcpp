@@ -17,17 +17,11 @@ class _MenuCovidPageState extends State<MenuCovidPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            RaisedButton(
-              color: Colors.blue,
-              padding: const EdgeInsets.all(8.0),
-              child: new Text(
-                "Recursos Propios COVID",
-              ),
-              elevation: 10.0,
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(10.0)),
-              onPressed: () {
-                Navigator.push(
+            Expanded(
+              flex: 5,
+              child: GestureDetector(
+                onTap: (){
+                   Navigator.push(
                     context,
                     MaterialPageRoute<Null>(
                       builder: (BuildContext context) {
@@ -35,19 +29,20 @@ class _MenuCovidPageState extends State<MenuCovidPage> {
                       },
                       fullscreenDialog: true,
                     ));
-              },
-            ),
-            RaisedButton(
-              elevation: 10.0,
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(10.0)),
-              color: Colors.greenAccent,
-              padding: const EdgeInsets.all(8.0),
-              child: new Text(
-                "Transferencias COVID",
+                },
+                              child: Container(
+                  height: 100,
+                  color: Colors.blueAccent,
+                  child: Center(child: Text('Recursos Propios COVID', style: TextStyle(fontSize: 20,color: Colors.white),)),
+                  padding: EdgeInsets.all(10),
+                ),
               ),
-              onPressed: () {
-                Navigator.push(
+            ),
+            Expanded(
+              flex: 5,
+              child: GestureDetector(
+                onTap: (){
+                   Navigator.push(
                     context,
                     MaterialPageRoute<Null>(
                       builder: (BuildContext context) {
@@ -55,7 +50,15 @@ class _MenuCovidPageState extends State<MenuCovidPage> {
                       },
                       fullscreenDialog: true,
                     ));
-              },
+                },
+                              child: Container(
+                    height: 100,
+                  color: Colors.cyan,
+                  child: Center(child: Text('Transferencias Financieras COVID' , 
+                  textAlign: TextAlign.center , style: TextStyle(fontSize: 20,color: Colors.white))),
+                  padding: EdgeInsets.all(10),
+                ),
+              ),
             ),
           ],
         ),
