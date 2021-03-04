@@ -55,6 +55,13 @@ class _CovidPageState extends State<CovidPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             )),
+            SizedBox(height: 5),
+            Center(
+              child: Text(
+                form.format(fecha.toDate()),
+                style: TextStyle(color: Colors.grey, fontSize: 18),
+              ),
+            ),
             SizedBox(height: 20),
             circularOperativo(context),
             SizedBox(height: 20),
@@ -140,14 +147,26 @@ class _CovidPageState extends State<CovidPage> {
           prueba
               .map((f) => {
                     presupuestoCargado = f['pim'],
-                    data2.add(new LinearSales('Ejecu',
-                        (f['ejecucion'] / f['pim']) * 100, Colors.purple)),
-                    data2.add(new LinearSales('SolPed',
-                        (f['solped'] / f['pim']) * 100, Colors.redAccent)),
-                    data2.add(new LinearSales('Reser',
-                        (f['reservas'] / f['pim']) * 100, Colors.greenAccent)),
-                    data2.add(new LinearSales('Pedi',
-                        (f['pedido'] / f['pim']) * 100, Colors.blueAccent))
+                    if (f['ejecucion'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Ejecu', f['ejecucion'], Colors.orangeAccent)),
+                      },
+                    if (f['solped'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'SolPed', f['solped'], Colors.redAccent)),
+                      },
+                    if (f['pedido'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Pedi', f['pedido'], Colors.blueAccent)),
+                      },
+                    if (f['reservas'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Reser', f['reservas'], Colors.greenAccent)),
+                      }
                   })
               .toList();
 
@@ -159,9 +178,9 @@ class _CovidPageState extends State<CovidPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero((row.sales / presupuestoCargado) * 100).output.compactNonSymbol}%'));
           return ConstrainedBox(
-              constraints: BoxConstraints.expand(height: 300.0),
+              constraints: BoxConstraints.expand(height: 400.0),
               child: IntrinsicHeight(
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,19 +208,31 @@ class _CovidPageState extends State<CovidPage> {
                             animationDuration: Duration(seconds: 2),
                             behaviors: [
                               new charts.DatumLegend(
+                                entryTextStyle: charts.TextStyleSpec(),
+                                legendDefaultMeasure:
+                                    charts.LegendDefaultMeasure.firstValue,
                                 position: charts.BehaviorPosition.bottom,
-                                cellPadding: EdgeInsets.all(5.0),
-                              )
+                                horizontalFirst: true,
+                                cellPadding: new EdgeInsets.only(
+                                    right: 4.0, bottom: 4.0),
+                              ),
                             ],
                             defaultRenderer: new charts.ArcRendererConfig(
-                                arcWidth: 80,
+                                arcWidth: 70,
                                 arcRendererDecorators: [
                                   new charts.ArcLabelDecorator(
                                       labelPosition:
                                           charts.ArcLabelPosition.auto,
+                                      labelPadding: 5,
+                                      showLeaderLines: true,
+                                      outsideLabelStyleSpec:
+                                          new charts.TextStyleSpec(
+                                              fontSize: 14,
+                                              color: charts.Color.fromHex(
+                                                  code: "#000000")),
                                       insideLabelStyleSpec:
                                           new charts.TextStyleSpec(
-                                              fontSize: 11,
+                                              fontSize: 16,
                                               color: charts.Color.fromHex(
                                                   code: "#000000")))
                                 ]),
@@ -233,74 +264,101 @@ class _CovidPageState extends State<CovidPage> {
           prueba
               .map((f) => {
                     presupuestoCargado = f['pim'],
-                    data2.add(new LinearSales('Ejecu',
-                        (f['ejecucion'] / f['pim']) * 100, Colors.purple)),
-                    data2.add(new LinearSales('SolPed',
-                        (f['solped'] / f['pim']) * 100, Colors.redAccent)),
-                    data2.add(new LinearSales('Reser',
-                        (f['reservas'] / f['pim']) * 100, Colors.greenAccent)),
-                    data2.add(new LinearSales('Pedi',
-                        (f['pedido'] / f['pim']) * 100, Colors.blueAccent))
+                    if (f['ejecucion'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Ejecu', f['ejecucion'], Colors.orangeAccent)),
+                      },
+                    if (f['solped'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'SolPed', f['solped'], Colors.redAccent)),
+                      },
+                    if (f['pedido'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Pedi', f['pedido'], Colors.blueAccent)),
+                      },
+                    if (f['reservas'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Reser', f['reservas'], Colors.greenAccent)),
+                      }
                   })
               .toList();
-
-          seriesListCircularSede.add(charts.Series<LinearSales, String>(
-              id: 'Sales',
-              domainFn: (LinearSales sales, _) => sales.year,
-              measureFn: (LinearSales sales, _) => sales.sales,
-              colorFn: (LinearSales sales, __) => sales.color,
-              data: data2,
-              // Set a label accessor to control the text of the arc label.
-              labelAccessorFn: (LinearSales row, _) =>
-                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
-          return ConstrainedBox(
-              constraints: BoxConstraints.expand(height: 300.0),
-              child: IntrinsicHeight(
-                  child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Center(
-                      child: Text('Gasto Capital',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold))),
-                  Center(
-                      child: Text(
-                          me
-                              .formatearNumero(presupuestoCargado)
-                              .output
-                              .withoutFractionDigits,
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold))),
-                  SizedBox(height: 10),
-                  Expanded(
-                      child: Container(
-                          height: 250,
-                          child: charts.PieChart(
-                            seriesListCircularSede,
-                            animate: true,
-                            animationDuration: Duration(seconds: 2),
-                            behaviors: [
-                              new charts.DatumLegend(
-                                position: charts.BehaviorPosition.bottom,
-                                cellPadding: EdgeInsets.all(5.0),
-                              )
-                            ],
-                            defaultRenderer: new charts.ArcRendererConfig(
-                                arcWidth: 80,
-                                arcRendererDecorators: [
-                                  new charts.ArcLabelDecorator(
-                                      labelPosition:
-                                          charts.ArcLabelPosition.auto,
-                                      insideLabelStyleSpec:
-                                          new charts.TextStyleSpec(
-                                              fontSize: 11,
-                                              color: charts.Color.fromHex(
-                                                  code: "#000000")))
-                                ]),
-                          )))
-                ],
-              )));
+          if (presupuestoCargado != 0) {
+            seriesListCircularSede.add(charts.Series<LinearSales, String>(
+                id: 'Sales',
+                domainFn: (LinearSales sales, _) => sales.year,
+                measureFn: (LinearSales sales, _) => sales.sales,
+                colorFn: (LinearSales sales, __) => sales.color,
+                data: data2,
+                // Set a label accessor to control the text of the arc label.
+                labelAccessorFn: (LinearSales row, _) =>
+                    '${me.formatearNumero((row.sales / presupuestoCargado) * 100).output.compactNonSymbol}%'));
+            return ConstrainedBox(
+                constraints: BoxConstraints.expand(height: 400.0),
+                child: IntrinsicHeight(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Center(
+                        child: Text('Gasto Capital',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold))),
+                    Center(
+                        child: Text(
+                            me
+                                .formatearNumero(presupuestoCargado)
+                                .output
+                                .withoutFractionDigits,
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold))),
+                    SizedBox(height: 10),
+                    Expanded(
+                        child: Container(
+                            height: 250,
+                            child: charts.PieChart(
+                              seriesListCircularSede,
+                              animate: true,
+                              animationDuration: Duration(seconds: 2),
+                              behaviors: [
+                                new charts.DatumLegend(
+                                  entryTextStyle: charts.TextStyleSpec(),
+                                  legendDefaultMeasure:
+                                      charts.LegendDefaultMeasure.firstValue,
+                                  position: charts.BehaviorPosition.bottom,
+                                  horizontalFirst: true,
+                                  cellPadding: new EdgeInsets.only(
+                                      right: 4.0, bottom: 4.0),
+                                ),
+                              ],
+                              defaultRenderer: new charts.ArcRendererConfig(
+                                  arcWidth: 70,
+                                  arcRendererDecorators: [
+                                    new charts.ArcLabelDecorator(
+                                        labelPosition:
+                                            charts.ArcLabelPosition.auto,
+                                        labelPadding: 5,
+                                        showLeaderLines: true,
+                                        outsideLabelStyleSpec:
+                                            new charts.TextStyleSpec(
+                                                fontSize: 16,
+                                                color: charts.Color.fromHex(
+                                                    code: "#000000")),
+                                        insideLabelStyleSpec:
+                                            new charts.TextStyleSpec(
+                                                fontSize: 16,
+                                                color: charts.Color.fromHex(
+                                                    code: "#000000")))
+                                  ]),
+                            )))
+                  ],
+                )));
+          } else {
+            return SizedBox(height: 1);
+          }
         });
   }
 
@@ -413,84 +471,87 @@ class _CovidPageState extends State<CovidPage> {
                   f['fecha'] == fecha &&
                   f['tipo'] == 'GASTO CAPITAL')
               .toList();
-
-          return Container(
-              color: Colors.white,
-              child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    columns: [
-                      DataColumn(
-                          label: Text("Compromiso",
-                              style: TextStyle(fontWeight: FontWeight.bold))),
-                      DataColumn(
-                          label: Text("Monto",
-                              style: TextStyle(fontWeight: FontWeight.bold))),
-                      DataColumn(
-                          label: Text("%",
-                              style: TextStyle(fontWeight: FontWeight.bold))),
-                    ],
-                    rows: [
-                      DataRow(cells: [
-                        DataCell(Text('Ejecucion')),
-                        DataCell(Text(me
-                            .formatearNumero((prueba[0]['ejecucion']))
-                            .output
-                            .withoutFractionDigits)),
-                        DataCell(Text(me
-                                .formatearNumero(((prueba[0]['ejecucion'] /
-                                        prueba[0]['pim']) *
-                                    100))
-                                .output
-                                .compactNonSymbol +
-                            '%')),
-                      ]),
-                      DataRow(cells: [
-                        DataCell(Text('SolPed')),
-                        DataCell(Text(me
-                            .formatearNumero((prueba[0]['solped']))
-                            .output
-                            .withoutFractionDigits)),
-                        DataCell(Text(me
-                                .formatearNumero(
-                                    ((prueba[0]['solped'] / prueba[0]['pim']) *
-                                        100))
-                                .output
-                                .compactNonSymbol +
-                            '%')),
-                      ]),
-                      DataRow(cells: [
-                        DataCell(Text('Pedidos')),
-                        DataCell(Text(me
-                            .formatearNumero((prueba[0]['pedido']))
-                            .output
-                            .withoutFractionDigits)),
-                        DataCell(Text(me
-                                .formatearNumero(
-                                    ((prueba[0]['pedido'] / prueba[0]['pim']) *
-                                        100))
-                                .output
-                                .compactNonSymbol +
-                            '%'))
-                      ]),
-                      DataRow(cells: [
-                        DataCell(Text('Reservas')),
-                        DataCell(Text(me
-                            .formatearNumero((prueba[0]['reservas']))
-                            .output
-                            .withoutFractionDigits)),
-                        DataCell(Text(me
-                                .formatearNumero(((prueba[0]['reservas'] /
-                                        prueba[0]['pim']) *
-                                    100))
-                                .output
-                                .compactNonSymbol +
-                            '%'))
-                      ])
-                    ],
-                    sortColumnIndex: 2,
-                    sortAscending: false,
-                  )));
+          if (prueba[0]['pim'] != 0) {
+            return Container(
+                color: Colors.white,
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      columns: [
+                        DataColumn(
+                            label: Text("Compromiso",
+                                style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(
+                            label: Text("Monto",
+                                style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(
+                            label: Text("%",
+                                style: TextStyle(fontWeight: FontWeight.bold))),
+                      ],
+                      rows: [
+                        DataRow(cells: [
+                          DataCell(Text('Ejecucion')),
+                          DataCell(Text(me
+                              .formatearNumero((prueba[0]['ejecucion']))
+                              .output
+                              .withoutFractionDigits)),
+                          DataCell(Text(me
+                                  .formatearNumero(((prueba[0]['ejecucion'] /
+                                          prueba[0]['pim']) *
+                                      100))
+                                  .output
+                                  .compactNonSymbol +
+                              '%')),
+                        ]),
+                        DataRow(cells: [
+                          DataCell(Text('SolPed')),
+                          DataCell(Text(me
+                              .formatearNumero((prueba[0]['solped']))
+                              .output
+                              .withoutFractionDigits)),
+                          DataCell(Text(me
+                                  .formatearNumero(((prueba[0]['solped'] /
+                                          prueba[0]['pim']) *
+                                      100))
+                                  .output
+                                  .compactNonSymbol +
+                              '%')),
+                        ]),
+                        DataRow(cells: [
+                          DataCell(Text('Pedidos')),
+                          DataCell(Text(me
+                              .formatearNumero((prueba[0]['pedido']))
+                              .output
+                              .withoutFractionDigits)),
+                          DataCell(Text(me
+                                  .formatearNumero(((prueba[0]['pedido'] /
+                                          prueba[0]['pim']) *
+                                      100))
+                                  .output
+                                  .compactNonSymbol +
+                              '%'))
+                        ]),
+                        DataRow(cells: [
+                          DataCell(Text('Reservas')),
+                          DataCell(Text(me
+                              .formatearNumero((prueba[0]['reservas']))
+                              .output
+                              .withoutFractionDigits)),
+                          DataCell(Text(me
+                                  .formatearNumero(((prueba[0]['reservas'] /
+                                          prueba[0]['pim']) *
+                                      100))
+                                  .output
+                                  .compactNonSymbol +
+                              '%'))
+                        ])
+                      ],
+                      sortColumnIndex: 2,
+                      sortAscending: false,
+                    )));
+          } else {
+            return SizedBox(height: 1);
+          }
         });
   }
 

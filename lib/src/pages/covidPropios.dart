@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/pages/bono.dart';
 import 'package:gcpp_essalud/src/pages/covid.dart';
-import 'package:gcpp_essalud/src/pages/covidTransferencia.dart';
 import 'package:gcpp_essalud/src/pages/decreto.dart';
 
 class RecursosPropiosPage extends StatefulWidget {
@@ -141,7 +140,18 @@ class _RecursosPropiosPageState extends State<RecursosPropiosPage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute<Null>(
+                        builder: (BuildContext context) {
+                          return DecretoPage(
+                            decreto: 'Covid-Sede',
+                          );
+                        },
+                        fullscreenDialog: true,
+                      ));
+                },
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.blue,

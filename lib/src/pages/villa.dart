@@ -56,10 +56,12 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
       });
     });
   }
-    listarVilla2() async {
+
+  listarVilla2() async {
     noteSubVilla2?.cancel();
     List<dynamic> aux = new List();
-    noteSubVilla2 = cloud.listarDatos('Villa-2').listen((QuerySnapshot snapshot) {
+    noteSubVilla2 =
+        cloud.listarDatos('Villa-2').listen((QuerySnapshot snapshot) {
       snapshot.documents.map((f) {
         f.data.values.map((d) {
           aux.add(d);
@@ -74,7 +76,7 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
   @override
   void initState() {
     super.initState();
-    etapa ="Etapa 1";
+    etapa = "Etapa 1";
     listarFecha();
     listarVilla();
     listarVilla2();
@@ -114,34 +116,32 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
   }
 
   Widget _builCombo(context) {
-    var array = ['Etapa 1','Etapa 2']; 
-          return DropdownButton(
-              hint: Text("Seleccione Red"),
-              value: etapa,
-              icon: Icon(Icons.arrow_drop_down),
-              iconSize: 24,
-              elevation: 16,
-              style: TextStyle(color: Colors.black, fontSize: 15),
-              onChanged: (String ge) {
-                setState(() {
-                  etapa = ge;
-                });
-              },
-              items: array.map((dynamic valor) {
-                return DropdownMenuItem<String>(
-                  value: valor,
-                  child: Text(
-                    valor,
-                    style: TextStyle(color: Colors.black, fontSize: 12),
-                  ),
-                );
-              }).toList());
-        
+    var array = ['Etapa 1', 'Etapa 2'];
+    return DropdownButton(
+        hint: Text("Seleccione Red"),
+        value: etapa,
+        icon: Icon(Icons.arrow_drop_down),
+        iconSize: 24,
+        elevation: 16,
+        style: TextStyle(color: Colors.black, fontSize: 15),
+        onChanged: (String ge) {
+          setState(() {
+            etapa = ge;
+          });
+        },
+        items: array.map((dynamic valor) {
+          return DropdownMenuItem<String>(
+            value: valor,
+            child: Text(
+              valor,
+              style: TextStyle(color: Colors.black, fontSize: 12),
+            ),
+          );
+        }).toList());
   }
+
   Widget linearVilla(context) {
-    if(etapa=='Etapa 1'){
-      
-    }
+    if (etapa == 'Etapa 1') {}
     List<dynamic> prueba = new List();
     List<TimeSeriesSales> data2 = new List();
     List<TimeSeriesSales> data3 = new List();
@@ -275,10 +275,8 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
           prueba
               .map((f) => {
                     presupuestoCargado = f['liberado'],
-                    data2.add(new LinearSales(
-                        'Ejecu',
-                        (f['ejecucion'] / f['liberado']) * 100,
-                        Colors.purple)),
+                    data2.add(new LinearSales('Ejecu',
+                        (f['ejecucion'] / f['liberado']) * 100, Colors.purple)),
                     data2.add(new LinearSales(
                         'Reser',
                         (f['reserva'] / f['liberado']) * 100,
@@ -304,7 +302,7 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}'));
           return ConstrainedBox(
               constraints: BoxConstraints.expand(height: 400.0),
               child: IntrinsicHeight(
@@ -508,7 +506,7 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
                 (f['solped'] / f['liberado']) * 100,
                 f['red'],
                 Colors.redAccent));
-            return circularRubros(context, data2,f['red'],f['liberado']);
+            return circularRubros(context, data2, f['red'], f['liberado']);
           }).toList());
         }
         return SizedBox(height: 1);
@@ -516,7 +514,7 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
     );
   }
 
-  Widget circularRubros(context, datos,rubro,cargado) {
+  Widget circularRubros(context, datos, rubro, cargado) {
     List<charts.Series<LinearSalesRubro, String>> circularVilla =
         new List<charts.Series<LinearSalesRubro, String>>();
     circularVilla.add(charts.Series<LinearSalesRubro, String>(
@@ -527,7 +525,7 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
         data: datos,
         // Set a label accessor to control the text of the arc label.
         labelAccessorFn: (LinearSalesRubro row, _) =>
-            '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+            '${row.year}:${me.formatearNumero(row.sales).output.compactNonSymbol}'));
     return ConstrainedBox(
         constraints: BoxConstraints.expand(height: 230.0),
         child: IntrinsicHeight(
@@ -539,10 +537,14 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
             Center(
                 child: Text(rubro,
                     style: TextStyle(color: Colors.grey, fontSize: 18))),
-                    SizedBox(height: 5),
-                     Center(
-                child: Text(me.formatearNumero(cargado).output.withoutFractionDigits,
-                    style: TextStyle(color: Colors.black, fontSize: 15,fontWeight: FontWeight.bold))),
+            SizedBox(height: 5),
+            Center(
+                child: Text(
+                    me.formatearNumero(cargado).output.withoutFractionDigits,
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold))),
             SizedBox(height: 10),
             Expanded(
                 child: Container(
@@ -567,7 +569,7 @@ class _VillaPanamericanaPageState extends State<VillaPanamericanaPage> {
                                     fontSize: 10,
                                     color:
                                         charts.Color.fromHex(code: "#000000")),
-                                            outsideLabelStyleSpec: new charts.TextStyleSpec(
+                                outsideLabelStyleSpec: new charts.TextStyleSpec(
                                     fontSize: 9,
                                     color:
                                         charts.Color.fromHex(code: "#000000")))

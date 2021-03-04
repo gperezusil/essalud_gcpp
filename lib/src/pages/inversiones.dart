@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/services/firestore.dart';
@@ -32,11 +31,12 @@ class _InversionesPageState extends State<InversionesPage> {
     super.initState();
     listar();
     colorInversiones = Colors.blueGrey;
-    annoSeleccionado = '2020';
+    annoSeleccionado = '2021';
     rubro1 = '3.1.1  Proyectos de Inversión';
     rubro2 = 'Obras';
     anno = new List();
     anno.add('2020');
+    anno.add('2021');
   }
 
   @override
@@ -64,21 +64,20 @@ class _InversionesPageState extends State<InversionesPage> {
     ));
   }
 
-   listar() async {
-   cloud.listarDatos('PruebaInversiones').listen((QuerySnapshot snapshot) {
-             List<dynamic> aux = new List();
-           
-            snapshot.documents.map((f){
-              f.data.values.map((d){
-               aux.add(d);    
-                }).toList();
-                setState(() {
-                datos = cloud.convertir(aux); 
-              });
-              }).toList();
-              
+  listar() async {
+    cloud.listarDatos('PruebaInversiones').listen((QuerySnapshot snapshot) {
+      List<dynamic> aux = new List();
+
+      snapshot.documents.map((f) {
+        f.data.values.map((d) {
+          aux.add(d);
+        }).toList();
+        setState(() {
+          datos = cloud.convertir(aux);
+        });
+      }).toList();
     });
-}
+  }
 
   @override
   void dispose() {
@@ -107,19 +106,21 @@ class _InversionesPageState extends State<InversionesPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                   FutureBuilder(
-                      future: datos,
-                      builder: (BuildContext context,
-                          AsyncSnapshot data) {
-                        if (!data.hasData) {
-                          return Center(child: new CircularProgressIndicator());
-                        }
-                        prueba = data.data.where((f)=>f['red']=='Total Gastos' 
-                        && f['anno']==annoSeleccionado
-                        && f['rubro']=='Total Gastos de Capital').toList();
+                  FutureBuilder(
+                    future: datos,
+                    builder: (BuildContext context, AsyncSnapshot data) {
+                      if (!data.hasData) {
+                        return Center(child: new CircularProgressIndicator());
+                      }
+                      prueba = data.data
+                          .where((f) =>
+                              f['red'] == 'Total Gastos' &&
+                              f['anno'] == annoSeleccionado &&
+                              f['rubro'] == 'Total Gastos de Capital')
+                          .toList();
                       return Container(
                           child: Column(
-                              children:prueba.map((item) {
+                              children: prueba.map((item) {
                         return Column(
                           children: <Widget>[
                             new CircularPercentIndicator(
@@ -128,7 +129,9 @@ class _InversionesPageState extends State<InversionesPage> {
                               animation: true,
                               percent: verificarNumero(item['porcentaje']),
                               center: new Text(
-                                me.formatearNumero(item['porcentaje'] * 100)
+                                me
+                                        .formatearNumero(
+                                            item['porcentaje'] * 100)
                                         .output
                                         .compactNonSymbol
                                         .toString() +
@@ -143,7 +146,8 @@ class _InversionesPageState extends State<InversionesPage> {
                                     fontWeight: FontWeight.bold,
                                   )),
                               footer: new Text(
-                                me.formatearNumero(item['ejecucion'])
+                                me
+                                    .formatearNumero(item['ejecucion'])
                                     .output
                                     .withoutFractionDigits
                                     .toString(),
@@ -167,8 +171,7 @@ class _InversionesPageState extends State<InversionesPage> {
                             SizedBox(height: 10),
                             Text(
                               "al " +
-                                  form.format(
-                                      f.parse(item['fecha']).toLocal()),
+                                  form.format(f.parse(item['fecha']).toLocal()),
                               style: TextStyle(color: Colors.grey),
                             )
                           ],
@@ -192,17 +195,19 @@ class _InversionesPageState extends State<InversionesPage> {
       spacing: 20.0, // gap between adjacent chips
       runSpacing: 8.0, // gap between lines
       children: [
-       FutureBuilder(
-                      future: datos,
-                      builder: (BuildContext context,
-                          AsyncSnapshot data) {
-                        if (!data.hasData) {
-                          return Center(child: new CircularProgressIndicator());
-                        }
-                        prueba2 = data.data.where((f)=>
-                        f['anno']==annoSeleccionado
-                        && f['red']=='Total Gastos de Capital').toList();
-                        prueba2.sort((a,b)=>a['rubro'].toString().compareTo(b['rubro'].toString()));
+        FutureBuilder(
+          future: datos,
+          builder: (BuildContext context, AsyncSnapshot data) {
+            if (!data.hasData) {
+              return Center(child: new CircularProgressIndicator());
+            }
+            prueba2 = data.data
+                .where((f) =>
+                    f['anno'] == annoSeleccionado &&
+                    f['red'] == 'Total Gastos de Capital')
+                .toList();
+            prueba2.sort((a, b) =>
+                a['rubro'].toString().compareTo(b['rubro'].toString()));
             return Container(
                 child: Wrap(
                     alignment: WrapAlignment.center,
@@ -217,7 +222,8 @@ class _InversionesPageState extends State<InversionesPage> {
                             animation: true,
                             percent: verificarNumero(item['porcentaje']),
                             center: new Text(
-                              me.formatearNumero(item['porcentaje'] * 100)
+                              me
+                                      .formatearNumero(item['porcentaje'] * 100)
                                       .output
                                       .compactNonSymbol
                                       .toString() +
@@ -231,7 +237,8 @@ class _InversionesPageState extends State<InversionesPage> {
                                   fontWeight: FontWeight.bold,
                                 )),
                             footer: new Text(
-                              me.formatearNumero(item['ejecucion'])
+                              me
+                                  .formatearNumero(item['ejecucion'])
                                   .output
                                   .withoutFractionDigits
                                   .toString(),
@@ -290,17 +297,19 @@ class _InversionesPageState extends State<InversionesPage> {
       spacing: 20.0, // gap between adjacent chips
       runSpacing: 8.0, // gap between lines
       children: [
-         FutureBuilder(
-                      future: datos,
-                      builder: (BuildContext context,
-                          AsyncSnapshot data) {
-                        if (!data.hasData) {
-                          return Center(child: new CircularProgressIndicator());
-                        }
-                        prueba3 = data.data.where((f)=>
-                        f['anno']==annoSeleccionado
-                        && f['red']=='3.1 Presupuesto de Inversiones').toList();
-                        prueba3.sort((a,b)=>a['rubro'].toString().compareTo(b['rubro'].toString()));
+        FutureBuilder(
+          future: datos,
+          builder: (BuildContext context, AsyncSnapshot data) {
+            if (!data.hasData) {
+              return Center(child: new CircularProgressIndicator());
+            }
+            prueba3 = data.data
+                .where((f) =>
+                    f['anno'] == annoSeleccionado &&
+                    f['red'] == '3.1 Presupuesto de Inversiones')
+                .toList();
+            prueba3.sort((a, b) =>
+                a['rubro'].toString().compareTo(b['rubro'].toString()));
             return Column(
               children: <Widget>[
                 Text(
@@ -324,12 +333,12 @@ class _InversionesPageState extends State<InversionesPage> {
                                       radius: 90.0,
                                       lineWidth: 9.0,
                                       animation: true,
-                                      percent: verificarNumero(
-                                          item['porcentaje']),
+                                      percent:
+                                          verificarNumero(item['porcentaje']),
                                       center: new Text(
-                                        me.formatearNumero(
-                                                    item['porcentaje'] *
-                                                        100)
+                                        me
+                                                .formatearNumero(
+                                                    item['porcentaje'] * 100)
                                                 .output
                                                 .compactNonSymbol
                                                 .toString() +
@@ -338,14 +347,14 @@ class _InversionesPageState extends State<InversionesPage> {
                                             fontWeight: FontWeight.bold,
                                             fontSize: 15.0),
                                       ),
-                                      header:
-                                          Text(item['rubro'].toString(),
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                              )),
+                                      header: Text(item['rubro'].toString(),
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          )),
                                       footer: new Text(
-                                        me.formatearNumero(item['ejecucion'])
+                                        me
+                                            .formatearNumero(item['ejecucion'])
                                             .output
                                             .withoutFractionDigits
                                             .toString(),
@@ -404,16 +413,17 @@ class _InversionesPageState extends State<InversionesPage> {
         ),
         SizedBox(height: 20),
         FutureBuilder(
-                      future: datos,
-                      builder: (BuildContext context,
-                          AsyncSnapshot data) {
-                        if (!data.hasData) {
-                          return Center(child: new CircularProgressIndicator());
-                        }
-                        prueba4 = data.data.where((f)=>
-                        f['anno']==annoSeleccionado
-                        && f['red']==rubro1).toList();
-                        prueba4.sort((a,b)=>a['rubro'].toString().compareTo(b['rubro'].toString()));
+          future: datos,
+          builder: (BuildContext context, AsyncSnapshot data) {
+            if (!data.hasData) {
+              return Center(child: new CircularProgressIndicator());
+            }
+            prueba4 = data.data
+                .where(
+                    (f) => f['anno'] == annoSeleccionado && f['red'] == rubro1)
+                .toList();
+            prueba4.sort((a, b) =>
+                a['rubro'].toString().compareTo(b['rubro'].toString()));
             return Container(
                 child: Wrap(
                     alignment: WrapAlignment.center,
@@ -429,10 +439,10 @@ class _InversionesPageState extends State<InversionesPage> {
                                   radius: 80.0,
                                   lineWidth: 9.0,
                                   animation: true,
-                                  percent:
-                                      verificarNumero(item['porcentaje']),
+                                  percent: verificarNumero(item['porcentaje']),
                                   center: new Text(
-                                    me.formatearNumero(
+                                    me
+                                            .formatearNumero(
                                                 item['porcentaje'] * 100)
                                             .output
                                             .compactNonSymbol
@@ -448,7 +458,8 @@ class _InversionesPageState extends State<InversionesPage> {
                                         fontWeight: FontWeight.bold,
                                       )),
                                   footer: new Text(
-                                    me.formatearNumero(item['ejecucion'])
+                                    me
+                                        .formatearNumero(item['ejecucion'])
                                         .output
                                         .withoutFractionDigits
                                         .toString(),
@@ -501,18 +512,20 @@ class _InversionesPageState extends State<InversionesPage> {
   Widget _buildetalledetalle(context) {
     return Column(
       children: <Widget>[
-         FutureBuilder(
-                      future: datos,
-                      builder: (BuildContext context,
-                          AsyncSnapshot data) {
-                        if (!data.hasData) {
-                          return Center(child: new CircularProgressIndicator());
-                        }
-                        prueba5 = data.data.where((f)=>
-                        f['anno']==annoSeleccionado
-                        && f['red']==rubro1
-                        && f['rubro']==rubro2).toList();
-                        prueba5.sort((a,b)=>a['rubro'].toString().compareTo(b['rubro'].toString()));
+        FutureBuilder(
+          future: datos,
+          builder: (BuildContext context, AsyncSnapshot data) {
+            if (!data.hasData) {
+              return Center(child: new CircularProgressIndicator());
+            }
+            prueba5 = data.data
+                .where((f) =>
+                    f['anno'] == annoSeleccionado &&
+                    f['red'] == rubro1 &&
+                    f['rubro'] == rubro2)
+                .toList();
+            prueba5.sort((a, b) =>
+                a['rubro'].toString().compareTo(b['rubro'].toString()));
             return Wrap(
               children: prueba5.map((item) {
                 return Column(
@@ -562,8 +575,7 @@ class _InversionesPageState extends State<InversionesPage> {
                               DataCell(
                                 Text(
                                     me
-                                        .formatearNumero(
-                                            item['comprometido'])
+                                        .formatearNumero(item['comprometido'])
                                         .output
                                         .withoutFractionDigits
                                         .toString(),
@@ -601,12 +613,12 @@ class _MyWiget2State extends State<MyWiget2> {
   List<String> valores;
   Future<List<dynamic>> resultado;
   String nomRed;
-   CloudService cloud = new CloudService();
+  CloudService cloud = new CloudService();
   @override
   @override
   void initState() {
     super.initState();
-    nomRed='LIMA';
+    nomRed = 'LIMA';
     listar();
     resultado = cloud.listarDatosPorColeccion('Obras');
   }
@@ -618,31 +630,26 @@ class _MyWiget2State extends State<MyWiget2> {
             color: Colors.white,
             child: SingleChildScrollView(
                 child: Column(
-              children: <Widget>[
-                _builCombo(context),
-                _buildObras(context)
-              ],
+              children: <Widget>[_builCombo(context), _buildObras(context)],
             ))));
   }
 
-
-   listar() async {
+  listar() async {
     List<String> aux = new List();
     valores = new List();
     resultado = cloud.listarDatosPorColeccion('Obras');
     await new Future.delayed(new Duration(seconds: 1));
-    resultado.then((f)=>f.map((f){
-      setState(() {
-          aux.add(f['red']);
-      valores = aux.toSet().toList();
-      });
-     }).toList());
-        
+    resultado.then((f) => f.map((f) {
+          setState(() {
+            aux.add(f['red']);
+            valores = aux.toSet().toList();
+          });
+        }).toList());
+
     await new Future.delayed(new Duration(seconds: 2));
-      
   }
 
-    Widget _builCombo(context) {
+  Widget _builCombo(context) {
     return Center(
         child: DropdownButton<String>(
             hint: Text("Seleccione Departamento"),
@@ -676,57 +683,58 @@ class _MyWiget2State extends State<MyWiget2> {
               if (data.data == null) {
                 return Text("Sin datos");
               }
-              prueba = data.data.where((f)=>f['red']==nomRed).toList();
+              prueba = data.data.where((f) => f['red'] == nomRed).toList();
               return Column(
-                children: prueba.map<Widget>((f){
-                  return Column(
-                    children: <Widget>[
-                        SizedBox(height: 20),
+                  children: prueba.map<Widget>((f) {
+                return Column(
+                  children: <Widget>[
+                    SizedBox(height: 20),
                     new CircularPercentIndicator(
-                              radius: 120.0,
-                              lineWidth: 13.0,
-                              animation: true,
-                              percent: me.verificarNumero(f['porcentaje']),
-                              center: new Text(
-                                me.formatearNumero(f['porcentaje'] * 100)
-                                        .output
-                                        .compactNonSymbol
-                                        .toString() +
-                                    '%',
-                                style: new TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20.0),
-                              ),
-                              header: Text(f['nombreObra'].toString(),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                  ),textAlign: TextAlign.center,),
-                              footer: new Text(
-                                me.formatearNumero(f['ejecucion'])
-                                    .output
-                                    .withoutFractionDigits
-                                    .toString(),
-                                style: new TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15.0),
-                              ),
-                              circularStrokeCap: CircularStrokeCap.round,
-                              progressColor: Colors.lightGreen,
-                            ),       SizedBox(height: 5),
-                                Text(
-                                  me
-                                      .formatearNumero(f['pia'])
-                                      .output
-                                      .withoutFractionDigits
-                                      .toString(),
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.grey),
-                                ),
-                    
-                    ],
-                  );
-                }).toList()
-              );
+                      radius: 120.0,
+                      lineWidth: 13.0,
+                      animation: true,
+                      percent: me.verificarNumero(f['porcentaje']),
+                      center: new Text(
+                        me
+                                .formatearNumero(f['porcentaje'] * 100)
+                                .output
+                                .compactNonSymbol
+                                .toString() +
+                            '%',
+                        style: new TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20.0),
+                      ),
+                      header: Text(
+                        f['nombreObra'].toString(),
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      footer: new Text(
+                        me
+                            .formatearNumero(f['ejecucion'])
+                            .output
+                            .withoutFractionDigits
+                            .toString(),
+                        style: new TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15.0),
+                      ),
+                      circularStrokeCap: CircularStrokeCap.round,
+                      progressColor: Colors.lightGreen,
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      me
+                          .formatearNumero(f['pia'])
+                          .output
+                          .withoutFractionDigits
+                          .toString(),
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ],
+                );
+              }).toList());
             }));
   }
 }

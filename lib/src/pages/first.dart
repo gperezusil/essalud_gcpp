@@ -7,20 +7,18 @@ import 'package:gcpp_essalud/src/util/metodos.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
-
 class FirstPage extends StatefulWidget {
   @override
   _FirstPageState createState() => _FirstPageState();
 }
 
 class _FirstPageState extends State<FirstPage> {
- 
   List<dynamic> lista;
   List<dynamic> detalleLista;
-  String titulo,detalle,detalledetalle,annoSeleccionado;
+  String titulo, detalle, detalledetalle, annoSeleccionado;
   Random random = new Random();
   CloudService cloud = new CloudService();
-  Color colorRubroIngresos,colorRubroEgresos;
+  Color colorRubroIngresos, colorRubroEgresos;
   final f = new DateFormat('dd-MM-yyyy');
   final form = new DateFormat('dd/MM/yyyy');
   Metodos me = Metodos();
@@ -34,21 +32,19 @@ class _FirstPageState extends State<FirstPage> {
   @override
   void initState() {
     listar();
-    
+
     super.initState();
     colorRubroIngresos = Colors.purple;
     colorRubroEgresos = Colors.lime[50];
-    annoSeleccionado = '2020';
+    annoSeleccionado = '2021';
     titulo = 'Ingresos Operativos';
-    detalle='Ingresos';
-    detalledetalle ='Ingresos Operativos';
+    detalle = 'Ingresos';
+    detalledetalle = 'Ingresos Operativos';
     anno = new List();
     anno.add('2019');
     anno.add('2020');
-
+    anno.add('2021');
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +61,7 @@ class _FirstPageState extends State<FirstPage> {
             SizedBox(height: 20),
             _buildCardEgresos(context),
             SizedBox(height: 20),
-             _buildCardDetalleIngresosOperativos(context)
+            _buildCardDetalleIngresosOperativos(context)
           ],
         ),
       ),
@@ -77,25 +73,23 @@ class _FirstPageState extends State<FirstPage> {
     noteSub?.cancel();
     super.dispose();
   }
-listar() async{
-  
+
+  listar() async {
     noteSub?.cancel();
-   noteSub= cloud.listarDatos('PruebaInstitucional').listen((QuerySnapshot snapshot) {
-     
-   List<dynamic> aux = new List();
-            snapshot.documents.map((f){
-              f.data.values.map((d){
-               aux.add(d);    
-                }).toList();
-                setState(() {
-                datos = cloud.convertir(aux); 
-              });
-              }).toList();
-              
+    noteSub = cloud
+        .listarDatos('PruebaInstitucional')
+        .listen((QuerySnapshot snapshot) {
+      List<dynamic> aux = new List();
+      snapshot.documents.map((f) {
+        f.data.values.map((d) {
+          aux.add(d);
+        }).toList();
+        setState(() {
+          datos = cloud.convertir(aux);
+        });
+      }).toList();
     });
-}
-
-
+  }
 
   Widget _buildCardIngresos(context) {
     return Card(
@@ -129,10 +123,11 @@ listar() async{
                             return Column(
                               children: <Widget>[
                                 new CircularPercentIndicator(
-                                  radius:120,
-                                  lineWidth:12.0,
+                                  radius: 120,
+                                  lineWidth: 12.0,
                                   animation: true,
-                                  percent: me.verificarNumero2(item['porcentaje']),
+                                  percent:
+                                      me.verificarNumero2(item['porcentaje']),
                                   center: new Text(
                                     me
                                             .formatearNumero(
@@ -185,13 +180,12 @@ listar() async{
                           }).toList())),
                           onTap: () {
                             setState(() {
-                               colorRubroIngresos = Colors.purple;
-                            colorRubroEgresos = Colors.lime[50];
-                             detalle='Ingresos';
-                            detalledetalle='Ingresos Operativos';
-                            titulo = 'Ingresos Operativos';
+                              colorRubroIngresos = Colors.purple;
+                              colorRubroEgresos = Colors.lime[50];
+                              detalle = 'Ingresos';
+                              detalledetalle = 'Ingresos Operativos';
+                              titulo = 'Ingresos Operativos';
                             });
-                           
                           });
                     },
                   ),
@@ -271,13 +265,12 @@ listar() async{
                           )),
                           onTap: () {
                             setState(() {
-                               colorRubroEgresos = Colors.blue;
-                            colorRubroIngresos = Colors.lime[50];
-                            detalledetalle='Gastos Operativos';
-                            titulo = 'Gastos Operativos';
-                                detalle='Egresos';
+                              colorRubroEgresos = Colors.blue;
+                              colorRubroIngresos = Colors.lime[50];
+                              detalledetalle = 'Gastos Operativos';
+                              titulo = 'Gastos Operativos';
+                              detalle = 'Egresos';
                             });
-                           
                           });
                     },
                   ),
@@ -292,28 +285,28 @@ listar() async{
   }
 
   Widget _buildCardEgresos(context) {
-   return FutureBuilder(
+    return FutureBuilder(
         future: datos,
         builder: (BuildContext context, AsyncSnapshot data) {
           if (!data.hasData) {
             return Text('Cargando Informacion');
           }
           lista = data.data
-              .where((f) =>
-                  f['padre'] == detalle && f['anno'] == annoSeleccionado)
+              .where(
+                  (f) => f['padre'] == detalle && f['anno'] == annoSeleccionado)
               .toList();
-            lista.sort((a,b)=>a['titulo'].toString().compareTo(b['titulo'].toString()));  
+          lista.sort((a, b) =>
+              a['titulo'].toString().compareTo(b['titulo'].toString()));
           return Wrap(
             alignment: WrapAlignment.center,
             spacing: 20.0, // gap between adjacent chips
             runSpacing: 8.0, // gap between lines
             children: lista.map((item) {
-              return new Wrap(
-                children: <Widget>[
+              return new Wrap(children: <Widget>[
                 Column(
                   children: <Widget>[
                     CircularPercentIndicator(
-                      radius:  90,
+                      radius: 90,
                       lineWidth: 11.0,
                       animation: true,
                       percent: me.verificarNumero(item['porcentaje']),
@@ -363,38 +356,36 @@ listar() async{
   }
 
   Widget _builCombo(context) {
-  
-    return  Container(
-      alignment: Alignment.topCenter,
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height/15 ,
-       child: Center(
-        child: DropdownButton(
-          
-            hint: Text("Seleccione Año"),
-            value: annoSeleccionado,
-            icon: Icon(Icons.arrow_drop_down),
-            iconSize: 24,
-            elevation: 16,
-            style: TextStyle(color: Colors.black, fontSize: 15),
-            onChanged: (String ge) {
-              setState(() {
-                annoSeleccionado = ge;
-              });
-            },
-            items: anno.map((String valor) {
-              return DropdownMenuItem<String>(
-                value: valor,
-                child: Text(
-                  valor,
-                  style: TextStyle(color: Colors.black, fontSize: 12),
-                ),
-              );
-            }).toList())));
+    return Container(
+        alignment: Alignment.topCenter,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height / 15,
+        child: Center(
+            child: DropdownButton(
+                hint: Text("Seleccione Año"),
+                value: annoSeleccionado,
+                icon: Icon(Icons.arrow_drop_down),
+                iconSize: 24,
+                elevation: 16,
+                style: TextStyle(color: Colors.black, fontSize: 15),
+                onChanged: (String ge) {
+                  setState(() {
+                    annoSeleccionado = ge;
+                  });
+                },
+                items: anno.map((String valor) {
+                  return DropdownMenuItem<String>(
+                    value: valor,
+                    child: Text(
+                      valor,
+                      style: TextStyle(color: Colors.black, fontSize: 12),
+                    ),
+                  );
+                }).toList())));
   }
 
   Widget _buildCardDetalleIngresosOperativos(context) {
-     return FutureBuilder(
+    return FutureBuilder(
         future: datos,
         builder: (BuildContext context, AsyncSnapshot data) {
           if (!data.hasData) {
@@ -404,68 +395,74 @@ listar() async{
               .where((f) =>
                   f['padre'] == detalledetalle && f['anno'] == annoSeleccionado)
               .toList();
-            detalleLista.sort((a,b)=>a['titulo'].toString().compareTo(b['titulo'].toString()));  
-    return GestureDetector(
-      child: Card(
-          elevation: 10,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-          ),
-          child: Container(
-              child: Column(children: [
-            Padding(
-                padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
-                child: Text(titulo,
-                    style: new TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 18.0))),
-            Padding(
-                padding: EdgeInsets.fromLTRB(15, 10, 5, 15),
-                child: Column(
-                    children: detalleLista.map((item) {
-                  return Column(
-                    children: <Widget>[
-                      Text(item['titulo'], style: new TextStyle(fontSize: 11.0)),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(15, 5, 5, 10),
-                        child: new LinearPercentIndicator(
-                          width: MediaQuery.of(context).size.width - 100,
-                          animation: true,
-                          lineHeight: 16.0,
-                          animationDuration: 2500,
-                          percent: me.verificarNumero(item['porcentaje']).toDouble(),
-                          center: Text(
-                              me
-                                      .formatearNumero((item['porcentaje'] * 100))
-                                      .output
-                                      .nonSymbol
-                                      .toString() +
-                                  '%',
-                              style: new TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 12.0)),
-                          linearStrokeCap: LinearStrokeCap.roundAll,
-                          progressColor: Color.fromARGB(
-                              255,
-                              random.nextInt(255),
-                              random.nextInt(255),
-                              random.nextInt(255)),
-                        ),
-                      )
-                    ],
-                  );
-                }).toList()))
-          ]))),
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute<Null>(
-              builder: (BuildContext context) {
-                return MyWiget2(datos: detalleLista);
-              },
-              fullscreenDialog: true,
-            ));
-      },
-    );
-      });
+          detalleLista.sort((a, b) =>
+              a['titulo'].toString().compareTo(b['titulo'].toString()));
+          return GestureDetector(
+            child: Card(
+                elevation: 10,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                child: Container(
+                    child: Column(children: [
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
+                      child: Text(titulo,
+                          style: new TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18.0))),
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 5, 15),
+                      child: Column(
+                          children: detalleLista.map((item) {
+                        return Column(
+                          children: <Widget>[
+                            Text(item['titulo'],
+                                style: new TextStyle(fontSize: 11.0)),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(15, 5, 5, 10),
+                              child: new LinearPercentIndicator(
+                                width: MediaQuery.of(context).size.width - 100,
+                                animation: true,
+                                lineHeight: 16.0,
+                                animationDuration: 2500,
+                                percent: me
+                                    .verificarNumero(item['porcentaje'])
+                                    .toDouble(),
+                                center: Text(
+                                    me
+                                            .formatearNumero(
+                                                (item['porcentaje'] * 100))
+                                            .output
+                                            .nonSymbol
+                                            .toString() +
+                                        '%',
+                                    style: new TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12.0)),
+                                linearStrokeCap: LinearStrokeCap.roundAll,
+                                progressColor: Color.fromARGB(
+                                    255,
+                                    random.nextInt(255),
+                                    random.nextInt(255),
+                                    random.nextInt(255)),
+                              ),
+                            )
+                          ],
+                        );
+                      }).toList()))
+                ]))),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute<Null>(
+                    builder: (BuildContext context) {
+                      return MyWiget2(datos: detalleLista);
+                    },
+                    fullscreenDialog: true,
+                  ));
+            },
+          );
+        });
   }
 }
 

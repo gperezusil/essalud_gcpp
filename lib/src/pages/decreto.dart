@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gcpp_essalud/src/pages/covid.dart';
@@ -30,6 +30,7 @@ class _DecretoPageState extends State<DecretoPage> {
   List<charts.Series<LinearSales, String>> seriesServicios;
   List<charts.Series<LinearSales, String>> seriesMedicinas;
   Metodos me = new Metodos();
+  final form = new DateFormat('dd/MM/yyyy');
   Timestamp fecha;
   CloudService cloud = new CloudService();
   Future<List<dynamic>> datos;
@@ -109,14 +110,26 @@ class _DecretoPageState extends State<DecretoPage> {
           prueba
               .map((f) => {
                     presupuestoCargado = f['pim'],
-                    data2.add(new LinearSales('Ejecu',
-                        (f['ejecucion'] / f['pim']) * 100, Colors.purple)),
-                    data2.add(new LinearSales('SolPed',
-                        (f['solped'] / f['pim']) * 100, Colors.redAccent)),
-                    data2.add(new LinearSales('Reser',
-                        (f['reservas'] / f['pim']) * 100, Colors.greenAccent)),
-                    data2.add(new LinearSales('Pedi',
-                        (f['pedido'] / f['pim']) * 100, Colors.blueAccent))
+                    if (f['ejecucion'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Ejecu', f['ejecucion'], Colors.orangeAccent)),
+                      },
+                    if (f['solped'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'SolPed', f['solped'], Colors.redAccent)),
+                      },
+                    if (f['pedido'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Pedi', f['pedido'], Colors.blueAccent)),
+                      },
+                    if (f['reservas'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Reser', f['reservas'], Colors.greenAccent)),
+                      }
                   })
               .toList();
 
@@ -128,9 +141,9 @@ class _DecretoPageState extends State<DecretoPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero((row.sales / presupuestoCargado) * 100).output.compactNonSymbol}%'));
           return ConstrainedBox(
-              constraints: BoxConstraints.expand(height: 300.0),
+              constraints: BoxConstraints.expand(height: 400.0),
               child: IntrinsicHeight(
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,6 +161,13 @@ class _DecretoPageState extends State<DecretoPage> {
                               .withoutFractionDigits,
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold))),
+                  SizedBox(height: 5),
+                  Center(
+                    child: Text(
+                      form.format(fecha.toDate()),
+                      style: TextStyle(color: Colors.grey, fontSize: 18),
+                    ),
+                  ),
                   SizedBox(height: 10),
                   Expanded(
                       child: Container(
@@ -158,19 +178,31 @@ class _DecretoPageState extends State<DecretoPage> {
                             animationDuration: Duration(seconds: 2),
                             behaviors: [
                               new charts.DatumLegend(
+                                entryTextStyle: charts.TextStyleSpec(),
+                                legendDefaultMeasure:
+                                    charts.LegendDefaultMeasure.firstValue,
                                 position: charts.BehaviorPosition.bottom,
-                                cellPadding: EdgeInsets.all(5.0),
-                              )
+                                horizontalFirst: true,
+                                cellPadding: new EdgeInsets.only(
+                                    right: 4.0, bottom: 4.0),
+                              ),
                             ],
                             defaultRenderer: new charts.ArcRendererConfig(
-                                arcWidth: 80,
+                                arcWidth: 70,
                                 arcRendererDecorators: [
                                   new charts.ArcLabelDecorator(
                                       labelPosition:
                                           charts.ArcLabelPosition.auto,
+                                      labelPadding: 5,
+                                      showLeaderLines: true,
+                                      outsideLabelStyleSpec:
+                                          new charts.TextStyleSpec(
+                                              fontSize: 14,
+                                              color: charts.Color.fromHex(
+                                                  code: "#000000")),
                                       insideLabelStyleSpec:
                                           new charts.TextStyleSpec(
-                                              fontSize: 11,
+                                              fontSize: 16,
                                               color: charts.Color.fromHex(
                                                   code: "#000000")))
                                 ]),
@@ -198,14 +230,26 @@ class _DecretoPageState extends State<DecretoPage> {
           prueba
               .map((f) => {
                     presupuestoCargado = f['pim'],
-                    data2.add(new LinearSales('Ejecu',
-                        (f['ejecucion'] / f['pim']) * 100, Colors.purple)),
-                    data2.add(new LinearSales('SolPed',
-                        (f['solped'] / f['pim']) * 100, Colors.redAccent)),
-                    data2.add(new LinearSales('Reser',
-                        (f['reservas'] / f['pim']) * 100, Colors.greenAccent)),
-                    data2.add(new LinearSales('Pedi',
-                        (f['pedido'] / f['pim']) * 100, Colors.blueAccent))
+                    if (f['ejecucion'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Ejecu', f['ejecucion'], Colors.orangeAccent)),
+                      },
+                    if (f['solped'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'SolPed', f['solped'], Colors.redAccent)),
+                      },
+                    if (f['pedido'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Pedi', f['pedido'], Colors.blueAccent)),
+                      },
+                    if (f['reservas'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Reser', f['reservas'], Colors.greenAccent)),
+                      }
                   })
               .toList();
 
@@ -217,9 +261,9 @@ class _DecretoPageState extends State<DecretoPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero((row.sales / presupuestoCargado) * 100).output.compactNonSymbol}%'));
           return ConstrainedBox(
-              constraints: BoxConstraints.expand(height: 200.0),
+              constraints: BoxConstraints.expand(height: 300.0),
               child: IntrinsicHeight(
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,12 +291,25 @@ class _DecretoPageState extends State<DecretoPage> {
                             animationDuration: Duration(seconds: 2),
                             behaviors: [
                               new charts.DatumLegend(
-                                position: charts.BehaviorPosition.end,
+                                showMeasures: true,
+                                horizontalFirst: false,
+                                outsideJustification:
+                                    charts.OutsideJustification.middleDrawArea,
+                                desiredMaxRows: 2,
+                                entryTextStyle: charts.TextStyleSpec(),
+                                legendDefaultMeasure:
+                                    charts.LegendDefaultMeasure.firstValue,
+                                measureFormatter: (num value) {
+                                  return value == null
+                                      ? '-'
+                                      : '${me.formatearNumero(value).output.withoutFractionDigits}';
+                                },
+                                position: charts.BehaviorPosition.bottom,
                                 cellPadding: EdgeInsets.all(5.0),
                               )
                             ],
                             defaultRenderer: new charts.ArcRendererConfig(
-                                arcWidth: 80,
+                                arcWidth: 30,
                                 arcRendererDecorators: [
                                   new charts.ArcLabelDecorator(
                                       labelPosition:
@@ -289,14 +346,26 @@ class _DecretoPageState extends State<DecretoPage> {
           prueba
               .map((f) => {
                     presupuestoCargado = f['pim'],
-                    data2.add(new LinearSales('Ejecu',
-                        (f['ejecucion'] / f['pim']) * 100, Colors.purple)),
-                    data2.add(new LinearSales('SolPed',
-                        (f['solped'] / f['pim']) * 100, Colors.redAccent)),
-                    data2.add(new LinearSales('Reser',
-                        (f['reservas'] / f['pim']) * 100, Colors.greenAccent)),
-                    data2.add(new LinearSales('Pedi',
-                        (f['pedido'] / f['pim']) * 100, Colors.blueAccent))
+                    if (f['ejecucion'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Ejecu', f['ejecucion'], Colors.orangeAccent)),
+                      },
+                    if (f['solped'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'SolPed', f['solped'], Colors.redAccent)),
+                      },
+                    if (f['pedido'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Pedi', f['pedido'], Colors.blueAccent)),
+                      },
+                    if (f['reservas'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Reser', f['reservas'], Colors.greenAccent)),
+                      }
                   })
               .toList();
 
@@ -308,9 +377,9 @@ class _DecretoPageState extends State<DecretoPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero((row.sales / presupuestoCargado) * 100).output.compactNonSymbol}%'));
           return ConstrainedBox(
-              constraints: BoxConstraints.expand(height: 200.0),
+              constraints: BoxConstraints.expand(height: 300.0),
               child: IntrinsicHeight(
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,12 +407,25 @@ class _DecretoPageState extends State<DecretoPage> {
                             animationDuration: Duration(seconds: 2),
                             behaviors: [
                               new charts.DatumLegend(
-                                position: charts.BehaviorPosition.end,
+                                showMeasures: true,
+                                horizontalFirst: false,
+                                outsideJustification:
+                                    charts.OutsideJustification.middleDrawArea,
+                                desiredMaxRows: 2,
+                                entryTextStyle: charts.TextStyleSpec(),
+                                legendDefaultMeasure:
+                                    charts.LegendDefaultMeasure.firstValue,
+                                measureFormatter: (num value) {
+                                  return value == null
+                                      ? '-'
+                                      : '${me.formatearNumero(value).output.withoutFractionDigits}';
+                                },
+                                position: charts.BehaviorPosition.bottom,
                                 cellPadding: EdgeInsets.all(5.0),
                               )
                             ],
                             defaultRenderer: new charts.ArcRendererConfig(
-                                arcWidth: 80,
+                                arcWidth: 30,
                                 arcRendererDecorators: [
                                   new charts.ArcLabelDecorator(
                                       labelPosition:
@@ -378,14 +460,26 @@ class _DecretoPageState extends State<DecretoPage> {
           prueba
               .map((f) => {
                     presupuestoCargado = f['pim'],
-                    data2.add(new LinearSales('Ejecu',
-                        (f['ejecucion'] / f['pim']) * 100, Colors.purple)),
-                    data2.add(new LinearSales('SolPed',
-                        (f['solped'] / f['pim']) * 100, Colors.redAccent)),
-                    data2.add(new LinearSales('Reser',
-                        (f['reservas'] / f['pim']) * 100, Colors.greenAccent)),
-                    data2.add(new LinearSales('Pedi',
-                        (f['pedido'] / f['pim']) * 100, Colors.blueAccent))
+                    if (f['ejecucion'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Ejecu', f['ejecucion'], Colors.orangeAccent)),
+                      },
+                    if (f['solped'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'SolPed', f['solped'], Colors.redAccent)),
+                      },
+                    if (f['pedido'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Pedi', f['pedido'], Colors.blueAccent)),
+                      },
+                    if (f['reservas'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Reser', f['reservas'], Colors.greenAccent)),
+                      }
                   })
               .toList();
 
@@ -397,9 +491,9 @@ class _DecretoPageState extends State<DecretoPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero((row.sales / presupuestoCargado) * 100).output.compactNonSymbol}%'));
           return ConstrainedBox(
-              constraints: BoxConstraints.expand(height: 200.0),
+              constraints: BoxConstraints.expand(height: 300.0),
               child: IntrinsicHeight(
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -427,12 +521,25 @@ class _DecretoPageState extends State<DecretoPage> {
                             animationDuration: Duration(seconds: 2),
                             behaviors: [
                               new charts.DatumLegend(
-                                position: charts.BehaviorPosition.end,
+                                showMeasures: true,
+                                horizontalFirst: false,
+                                outsideJustification:
+                                    charts.OutsideJustification.middleDrawArea,
+                                desiredMaxRows: 2,
+                                entryTextStyle: charts.TextStyleSpec(),
+                                legendDefaultMeasure:
+                                    charts.LegendDefaultMeasure.firstValue,
+                                measureFormatter: (num value) {
+                                  return value == null
+                                      ? '-'
+                                      : '${me.formatearNumero(value).output.withoutFractionDigits}';
+                                },
+                                position: charts.BehaviorPosition.bottom,
                                 cellPadding: EdgeInsets.all(5.0),
                               )
                             ],
                             defaultRenderer: new charts.ArcRendererConfig(
-                                arcWidth: 80,
+                                arcWidth: 30,
                                 arcRendererDecorators: [
                                   new charts.ArcLabelDecorator(
                                       labelPosition:
@@ -469,14 +576,26 @@ class _DecretoPageState extends State<DecretoPage> {
           prueba
               .map((f) => {
                     presupuestoCargado = f['pim'],
-                    data2.add(new LinearSales('Ejecu',
-                        (f['ejecucion'] / f['pim']) * 100, Colors.purple)),
-                    data2.add(new LinearSales('SolPed',
-                        (f['solped'] / f['pim']) * 100, Colors.redAccent)),
-                    data2.add(new LinearSales('Reser',
-                        (f['reservas'] / f['pim']) * 100, Colors.greenAccent)),
-                    data2.add(new LinearSales('Pedi',
-                        (f['pedido'] / f['pim']) * 100, Colors.blueAccent))
+                    if (f['ejecucion'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Ejecu', f['ejecucion'], Colors.orangeAccent)),
+                      },
+                    if (f['solped'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'SolPed', f['solped'], Colors.redAccent)),
+                      },
+                    if (f['pedido'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Pedi', f['pedido'], Colors.blueAccent)),
+                      },
+                    if (f['reservas'] / f['pim'] > 0)
+                      {
+                        data2.add(new LinearSales(
+                            'Reser', f['reservas'], Colors.greenAccent)),
+                      }
                   })
               .toList();
 
@@ -488,9 +607,9 @@ class _DecretoPageState extends State<DecretoPage> {
               data: data2,
               // Set a label accessor to control the text of the arc label.
               labelAccessorFn: (LinearSales row, _) =>
-                  '${me.formatearNumero(row.sales).output.compactNonSymbol}%'));
+                  '${me.formatearNumero((row.sales / presupuestoCargado) * 100).output.compactNonSymbol}%'));
           return ConstrainedBox(
-              constraints: BoxConstraints.expand(height: 200.0),
+              constraints: BoxConstraints.expand(height: 300.0),
               child: IntrinsicHeight(
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -518,12 +637,25 @@ class _DecretoPageState extends State<DecretoPage> {
                             animationDuration: Duration(seconds: 2),
                             behaviors: [
                               new charts.DatumLegend(
-                                position: charts.BehaviorPosition.end,
+                                showMeasures: true,
+                                horizontalFirst: false,
+                                outsideJustification:
+                                    charts.OutsideJustification.middleDrawArea,
+                                desiredMaxRows: 2,
+                                entryTextStyle: charts.TextStyleSpec(),
+                                legendDefaultMeasure:
+                                    charts.LegendDefaultMeasure.firstValue,
+                                measureFormatter: (num value) {
+                                  return value == null
+                                      ? '-'
+                                      : '${me.formatearNumero(value).output.withoutFractionDigits}';
+                                },
+                                position: charts.BehaviorPosition.bottom,
                                 cellPadding: EdgeInsets.all(5.0),
                               )
                             ],
                             defaultRenderer: new charts.ArcRendererConfig(
-                                arcWidth: 80,
+                                arcWidth: 30,
                                 arcRendererDecorators: [
                                   new charts.ArcLabelDecorator(
                                       labelPosition:
