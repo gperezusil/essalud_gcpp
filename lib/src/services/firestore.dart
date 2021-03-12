@@ -29,6 +29,16 @@ class CloudService {
     return snapshots;
   }
 
+  Stream<QuerySnapshot> listarTransferencia2021(String colec,
+      {int offset, int limit}) {
+    Query coleccion = Firestore.instance
+        .collection('Transferencias2021')
+        .where('fondo', isEqualTo: colec);
+    Stream<QuerySnapshot> snapshots = coleccion.snapshots();
+
+    return snapshots;
+  }
+
   Future<List<dynamic>> listarDatosPorColeccion(String coleccion) async {
     List<dynamic> aux = new List();
 

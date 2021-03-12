@@ -51,8 +51,9 @@ class _SuspensionPerfectaPage2021State
   listar() async {
     noteSub?.cancel();
     List<dynamic> aux = new List();
-    noteSub =
-        cloud.listarTransferencia('002628').listen((QuerySnapshot snapshot) {
+    noteSub = cloud
+        .listarTransferencia2021('002628')
+        .listen((QuerySnapshot snapshot) {
       snapshot.documents.map((f) {
         aux.add(f);
       }).toList();
